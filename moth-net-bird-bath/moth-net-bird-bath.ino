@@ -40,7 +40,7 @@ typedef struct struct_message {
 unsigned long prevMillisSensorPoll;
 #define SENSOR_POLL 160
 #define TOUCHPIN 4
-#define TOUCH_THRESH 12
+#define TOUCH_THRESH 15
 int currTouch;
 bool isTouched = false;
 
@@ -120,17 +120,22 @@ void loop() {
   if (millis() - prevMillisSensorPoll > SENSOR_POLL) {
     prevMillisSensorPoll = millis();
     currTouch = touchRead(TOUCHPIN);
+    Serial.println(currTouch);
     if (currTouch < TOUCH_THRESH && isTouched == false) {
-      isTouched = true;
-      digitalWrite(LED, LED_ON);
-      Serial.println("touch triggered");
+      delay(5);
+      currTouch = touchRead(TOUCHPIN);
+      if (currTouch < TOUCH_THRESH) {
+        isTouched = true;
+        digitalWrite(LED, LED_ON);
+        Serial.println("touch triggered");
 
-      //set sensor struct
-      outgoingReadings.sensors = cap_touch;
-      outgoingReadings.ID = MY_ID;
-      outgoingReadings.eventVal = 1;
+        //set sensor struct
+        outgoingReadings.sensors = cap_touch;
+        outgoingReadings.ID = MY_ID;
+        outgoingReadings.eventVal = 1;
 
-      sendESPNOW();
+        sendESPNOW();
+      }
     } else if (currTouch > TOUCH_THRESH && isTouched == true) {
       isTouched = false;
     } else if (currTouch > TOUCH_THRESH && isTouched == false) {
