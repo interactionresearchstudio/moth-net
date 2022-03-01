@@ -1,7 +1,7 @@
 #include <esp_now.h>
 #include <esp_wifi.h>
 #include <WiFi.h>
-#define CHANNEL 1
+#define CHANNEL 11
 #define MY_ID 1
 #define MSG_SIZE 12
 
@@ -87,7 +87,7 @@ void setup() {
 
   esp_wifi_start();
   esp_wifi_set_promiscuous(true);
-  //esp_wifi_set_channel(CHANNEL, WIFI_SECOND_CHAN_NONE);
+  esp_wifi_set_channel(CHANNEL, WIFI_SECOND_CHAN_NONE);
 
 
   // Init ESP-NOW
