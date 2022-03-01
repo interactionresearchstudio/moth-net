@@ -1,13 +1,13 @@
 #include <esp_now.h>
 #include <esp_wifi.h>
 #include <WiFi.h>
-#define CHANNEL 1
+#define CHANNEL 11
 #define MY_ID 1
 #define MSG_SIZE 12
 
 #define LED 2
-#define LED_ON 0
-#define LED_OFF 1
+#define LED_ON 1
+#define LED_OFF 0
 
 enum sensorTypes {
   cap_touch,
@@ -30,22 +30,22 @@ sensorTypes incomingSensorType;
 byte incomingID;
 int incomingEventVal;
 
-unsigned long prevMillisSensorPoll;
-#define SENSOR_POLL 160
-#define TOUCHPIN 4
-#define TOUCH_THRESH 12
-int currTouch;
-bool isTouched = false;
-
-// Variable to store if sending data was successful
-String success;
-
 //Structure example to send data
 typedef struct struct_message {
   byte ID;
   sensorTypes sensors;
   int eventVal;
 } struct_message;
+
+unsigned long prevMillisSensorPoll;
+#define SENSOR_POLL 160
+#define TOUCHPIN 4
+#define TOUCH_THRESH 15
+int currTouch;
+bool isTouched = false;
+
+// Variable to store if sending data was successful
+String success;
 
 // Create a struct_message to hold incoming sensor readings
 struct_message incomingReadings;
@@ -120,24 +120,25 @@ void loop() {
   if (millis() - prevMillisSensorPoll > SENSOR_POLL) {
     prevMillisSensorPoll = millis();
     currTouch = touchRead(TOUCHPIN);
-    if (currTouch > TOUCH_THRESH && isTouched == false) {
-      isTouched = true;
-      digitalWrite(LED, LED_ON);
-      Serial.println("touch triggered");
+    Serial.println(currTouch);
+    if (currTouch < TOUCH_THRESH && isTouched == false) {
+      delay(5);
+      currTouch = touchRead(TOUCHPIN);
+      if (currTouch < TOUCH_THRESH) {
+        isTouched = true;
+        digitalWrite(LED, LED_ON);
+        Serial.println("touch triggered");
 
-      //set sensor struct
-     // outgoingReadings.sensors = cap_touch;
-     // outgoingReadings.ID = MY_ID;
-     // outgoingReadings.eventVal = 1;
+        //set sensor struct
+        outgoingReadings.sensors = cap_touch;
+        outgoingReadings.ID = MY_ID;
+        outgoingReadings.eventVal = 1;
 
-       outgoingReadings.sensors = cam_photo;
-       outgoingReadings.ID = MY_ID;
-       outgoingReadings.eventVal = 1;
-
-      sendESPNOW();
-    } else if (currTouch < TOUCH_THRESH && isTouched == true) {
+        sendESPNOW();
+      }
+    } else if (currTouch > TOUCH_THRESH && isTouched == true) {
       isTouched = false;
-    } else if (currTouch < TOUCH_THRESH && isTouched == false) {
+    } else if (currTouch > TOUCH_THRESH && isTouched == false) {
       digitalWrite(LED, LED_OFF);
     }
   }
