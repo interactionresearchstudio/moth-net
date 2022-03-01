@@ -1,32 +1,8 @@
-// Adafruit IO Analog In Example
-// Tutorial Link: https://learn.adafruit.com/adafruit-io-basics-analog-input
-//
-// Adafruit invests time and resources providing this open source code.
-// Please support Adafruit and open source hardware by purchasing
-// products from Adafruit!
-//
-// Written by Todd Treece for Adafruit Industries
-// Copyright (c) 2016 Adafruit Industries
-// Licensed under the MIT license.
-//
-// All text above must be included in any redistribution.
-
-/************************** Configuration ***********************************/
-
-// edit the config.h tab and enter your Adafruit IO credentials
-// and any additional configuration needed for WiFi, cellular,
-// or ethernet clients.
-#include "config.h"
-
-/************************ Example Starts Here *******************************/
-
-
-
-// set up the 'analog' feed
-AdafruitIO_Feed *freader1 = io.feed("freader-hucknall-1");
-
 #include <esp_now.h>
-#include <WiFi.h>
+#include <WiFiManager.h>
+#include <Preferences.h>
+
+Preferences preferences;
 
 uint8_t globalMac[] = {0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF};
 char rfidStr[18];
@@ -36,25 +12,57 @@ typedef struct message_struct {
 
 message_struct msg;
 
+String aio_key;
+
 void setup() {
 
   // start the serial connection
   Serial.begin(115200);
+  pinMode(0, INPUT_PULLUP);
 
-  // wait for serial monitor to open
-  while (! Serial);
+  // Setup ESP Now
   WiFi.mode(WIFI_STA);
   if (esp_now_init() == ESP_OK) {
     Serial.println("ESPNow Init Success");
   }
   else {
     Serial.println("ESPNow Init Failed");
-    ESP.restart();
+    //ESP.restart();
   }
-
   esp_now_register_recv_cb(onDataReceive);
 
 
+
+  // WiFi manager
+  WiFiManager wm;
+  WiFiManagerParameter aio_key_value("aio_key", "Adafruit IO key", "", 40);
+  wm.addParameter(&aio_key_value);
+
+  if (digitalRead(0) == LOW) {
+    wm.startConfigPortal("moth-net", "badgersandfoxes");
+  }
+  else {
+    wm.autoConnect("moth-net", "badgersandfoxes");
+  }
+
+  Serial.println("Connected to WiFi.");
+
+  Serial.println(strlen(aio_key_value.getValue()));
+  if (strlen(aio_key_value.getValue()) > 0) {
+    Serial.println("Saving custom fields");
+    preferences.begin("moth-net", false);
+    preferences.putString("aio-key", aio_key_value.getValue());
+    preferences.end();
+  }
+
+  Serial.println("Loading preferences...");
+  preferences.begin("moth-net", false);
+  aio_key = preferences.getString("aio-key", "");
+  preferences.end();
+
+  Serial.print("AIO key: ");
+  Serial.println(aio_key);
+  while (1);
 }
 
 double lat = 42.331427;
@@ -69,38 +77,38 @@ void loop() {
   // it should always be present at the top of your loop
   // function. it keeps the client connected to
   // io.adafruit.com, and processes any incoming data.
-  if (toSend) {
-    toSend = false;
-    
-      // connect to io.adafruit.com
-      Serial.print("Connecting to Adafruit IO");
-      io.connect();
-
-      // wait for a connection
-      while (io.status() < AIO_CONNECTED) {
-      Serial.print(".");
-      delay(500);
-      }
-
-      // we are connected
-      Serial.println();
-      Serial.println(io.statusText());
-      
-      freader1->save(rfidStr, lat, lon, ele);
-
-      delay(4000);
-      WiFi.mode(WIFI_STA);
-     // WiFi.disconnect();
-      if (esp_now_init() == ESP_OK) {
-      Serial.println("ESPNow Init Success");
-      }
-      else {
-      Serial.println("ESPNow Init Failed");
-      ESP.restart();
-      }
-      io.run();
-    
-  }
+//  if (toSend) {
+//    toSend = false;
+//
+//    // connect to io.adafruit.com
+//    Serial.print("Connecting to Adafruit IO");
+//    io.connect();
+//
+//    // wait for a connection
+//    while (io.status() < AIO_CONNECTED) {
+//      Serial.print(".");
+//      delay(500);
+//    }
+//
+//    // we are connected
+//    Serial.println();
+//    Serial.println(io.statusText());
+//
+//    freader1->save(rfidStr, lat, lon, ele);
+//
+//    delay(4000);
+//    WiFi.mode(WIFI_STA);
+//    // WiFi.disconnect();
+//    if (esp_now_init() == ESP_OK) {
+//      Serial.println("ESPNow Init Success");
+//    }
+//    else {
+//      Serial.println("ESPNow Init Failed");
+//      ESP.restart();
+//    }
+//    io.run();
+//
+//  }
 
   //  String tag = "01D5F3B2";
   //  // return if the value hasn't changed
@@ -124,7 +132,7 @@ void onDataReceive(const uint8_t * mac_addr, const uint8_t *incomingData, int le
   Serial.print("Bytes received: ");
   Serial.println(len);
   Serial.print("Data: ");
-  
+
   snprintf(rfidStr, sizeof(rfidStr), "%02x%02x%02x%02x", msg.rfid[0], msg.rfid[1], msg.rfid[2], msg.rfid[3]);
   //Serial.println(rfidStr);
   Serial.print("sending...");
