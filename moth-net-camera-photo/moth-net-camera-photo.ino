@@ -13,6 +13,13 @@ enum sensorTypes {
   cam_photo
 };
 
+//Structure example to send data
+typedef struct struct_message {
+  byte ID;
+  sensorTypes sensors;
+  int eventVal;
+} struct_message;
+
 bool readyToPhoto = false;
 
 // REPLACE WITH THE MAC Address of your receiver
@@ -29,12 +36,7 @@ int incomingEventVal;
 
 String success;
 
-//Structure example to send data
-typedef struct struct_message {
-  byte ID;
-  sensorTypes sensors;
-  int eventVal;
-} struct_message;
+
 
 // Create a struct_message to hold incoming sensor readings
 struct_message incomingReadings;

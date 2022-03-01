@@ -6,8 +6,8 @@
 #define MSG_SIZE 12
 
 #define LED 2
-#define LED_ON 0
-#define LED_OFF 1
+#define LED_ON 1
+#define LED_OFF 0
 
 enum sensorTypes {
   cap_touch,
@@ -30,6 +30,13 @@ sensorTypes incomingSensorType;
 byte incomingID;
 int incomingEventVal;
 
+//Structure example to send data
+typedef struct struct_message {
+  byte ID;
+  sensorTypes sensors;
+  int eventVal;
+} struct_message;
+
 unsigned long prevMillisSensorPoll;
 #define SENSOR_POLL 160
 #define TOUCHPIN 4
@@ -39,13 +46,6 @@ bool isTouched = false;
 
 // Variable to store if sending data was successful
 String success;
-
-//Structure example to send data
-typedef struct struct_message {
-  byte ID;
-  sensorTypes sensors;
-  int eventVal;
-} struct_message;
 
 // Create a struct_message to hold incoming sensor readings
 struct_message incomingReadings;
@@ -87,7 +87,7 @@ void setup() {
 
   esp_wifi_start();
   esp_wifi_set_promiscuous(true);
-  esp_wifi_set_channel(CHANNEL, WIFI_SECOND_CHAN_NONE);
+  //esp_wifi_set_channel(CHANNEL, WIFI_SECOND_CHAN_NONE);
 
 
   // Init ESP-NOW
@@ -120,24 +120,20 @@ void loop() {
   if (millis() - prevMillisSensorPoll > SENSOR_POLL) {
     prevMillisSensorPoll = millis();
     currTouch = touchRead(TOUCHPIN);
-    if (currTouch > TOUCH_THRESH && isTouched == false) {
+    if (currTouch < TOUCH_THRESH && isTouched == false) {
       isTouched = true;
       digitalWrite(LED, LED_ON);
       Serial.println("touch triggered");
 
       //set sensor struct
-     // outgoingReadings.sensors = cap_touch;
-     // outgoingReadings.ID = MY_ID;
-     // outgoingReadings.eventVal = 1;
-
-       outgoingReadings.sensors = cam_photo;
-       outgoingReadings.ID = MY_ID;
-       outgoingReadings.eventVal = 1;
+      outgoingReadings.sensors = cap_touch;
+      outgoingReadings.ID = MY_ID;
+      outgoingReadings.eventVal = 1;
 
       sendESPNOW();
-    } else if (currTouch < TOUCH_THRESH && isTouched == true) {
+    } else if (currTouch > TOUCH_THRESH && isTouched == true) {
       isTouched = false;
-    } else if (currTouch < TOUCH_THRESH && isTouched == false) {
+    } else if (currTouch > TOUCH_THRESH && isTouched == false) {
       digitalWrite(LED, LED_OFF);
     }
   }
