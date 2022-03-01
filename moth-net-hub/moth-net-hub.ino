@@ -166,13 +166,15 @@ void onDataReceive(const uint8_t * mac_addr, const uint8_t *incomingData, int le
   Serial.print("Value: ");
   Serial.println(msg.eventVal);
 
+  String aio_message = "{\"value\": " + String(msg.eventVal) + ",\"lat\": 51.516651, \"lon\": -0.076840}";
+
   if (msg.sensors == cap_touch) {
-    client.publish((aio_user + String("/f/moth-net.bird-bath")).c_str(), String(msg.eventVal).c_str());
+    client.publish((aio_user + String("/f/moth-net.bird-bath")).c_str(), aio_message.c_str());
   } 
   else if (msg.sensors == cam_movement) {
-    client.publish((aio_user + String("/f/moth-net.camera")).c_str(), String(msg.eventVal).c_str());
+    client.publish((aio_user + String("/f/moth-net.camera")).c_str(), aio_message.c_str());
   }
   else if (msg.sensors == simple_switch) {
-    client.publish((aio_user + String("/f/moth-net.switch")).c_str(), String(msg.eventVal).c_str());
+    client.publish((aio_user + String("/f/moth-net.switch")).c_str(), aio_message.c_str());
   }
 }
