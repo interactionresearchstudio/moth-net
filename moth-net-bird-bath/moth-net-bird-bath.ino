@@ -13,7 +13,8 @@ enum sensorTypes {
   cap_touch,
   simple_switch,
   cam_movement,
-  radar
+  radar,
+  cam_photo
 };
 
 
@@ -30,9 +31,9 @@ byte incomingID;
 int incomingEventVal;
 
 unsigned long prevMillisSensorPoll;
-#define SENSOR_POLL 100
+#define SENSOR_POLL 160
 #define TOUCHPIN 4
-#define TOUCH_THRESH 15
+#define TOUCH_THRESH 12
 int currTouch;
 bool isTouched = false;
 
@@ -66,7 +67,7 @@ void OnDataSent(const uint8_t *mac_addr, esp_now_send_status_t status) {
 
 // Callback when data is received
 void OnDataRecv(const uint8_t * mac, const uint8_t *incomingData, int len) {
-  if (sizeof(incomingData) == MSG_SIZE) {
+  if (len == MSG_SIZE) {
     memcpy(&incomingReadings, incomingData, sizeof(incomingReadings));
     Serial.print("Bytes received: ");
     Serial.println(len);
@@ -125,9 +126,13 @@ void loop() {
       Serial.println("touch triggered");
 
       //set sensor struct
-      outgoingReadings.sensors = cap_touch;
-      outgoingReadings.ID = MY_ID;
-      outgoingReadings.eventVal = 1;
+     // outgoingReadings.sensors = cap_touch;
+     // outgoingReadings.ID = MY_ID;
+     // outgoingReadings.eventVal = 1;
+
+       outgoingReadings.sensors = cam_photo;
+       outgoingReadings.ID = MY_ID;
+       outgoingReadings.eventVal = 1;
 
       sendESPNOW();
     } else if (currTouch < TOUCH_THRESH && isTouched == true) {
@@ -150,4 +155,5 @@ void sendESPNOW() {
   else {
     Serial.println("Error sending the data");
   }
+  delay(1000);
 }
