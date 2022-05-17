@@ -26,3 +26,4 @@ Make sure to install all libraries required through the Library manager. One ESP
  - "On the Fly" Sensor and Action connections
  - Automatic ESP-NOW Channel configuration based on the Home Network Wi-Fi channel
  - Ability to deploy without home network connection
+ - Change captive portal to YoYo Machines captive portal
