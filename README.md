@@ -12,3 +12,7 @@ Here's a list of the sensors currently supported:
 
 ## Installation
 Make sure to install all libraries required through the Library manager. One ESP-32 board must be present, acting as the hub in order for messages to be forwarded to Adafruit IO. Currently, all ESP-32 sensors must be configured to run on the same WiFi channel as the hub (which in turn uses the internet router's channel).
+
+## Networking Diagram
+
+![diagram](Moth-net%20diagram.jpg)
