@@ -19,7 +19,7 @@ Make sure to install all libraries required through the Library manager. One ESP
 
 ## Networking Diagram
 
-![diagram](Moth-net%20diagram.jpg)
+![diagram](https://github.com/interactionresearchstudio/moth-net/blob/main/Moth-net%20diagram.jpeg)
 
 ## To Do
  - Visual connection interface on captive portal
