@@ -37,6 +37,12 @@ Make sure to install all libraries required through the Library manager. One ESP
 - **BUG:** Ensure your Home Wi-Fi network channel is the same as listed in the firmware of the Sensors and Device Hub.
 - Power up your devices and place then in the field. We recommend the Device hub be powered close to your Home network Router inside, but within line of sight of the sensors up to 50m. We recommend trial testing sending sensor data from the sensor to the hub and checking if it has been recorded on your Adafruit IO feed before leaving devices to collect data.
 
+## Tests
+
+- To test your connection from Adafruit IO to hub by creating a button on a Adafruit IO dashboard connected to a feed called moth-hub-led. Make sure the button sends value 1 on press, and 0 on release
+
+![GIF](https://media0.giphy.com/media/EEayYfkQa362ftdd3D/giphy.gif)
+
 ## To Do
  - Visual connection interface on captive portal
  - "On the Fly" Sensor and Action connections
