@@ -95,7 +95,7 @@ void setup() {
   initSPIFFS();
   initPrefs();
   Serial.println(loadJSON());
-  setNetwork();
+ // setNetwork(); //Only use when no UI to input credentials
 
   //We need to do wifi/espnow/wifi initialisation to get the wifi channel to be able to set sensors to the correct WiFi channel.
   initWiFi();
