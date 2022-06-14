@@ -24,44 +24,54 @@ void connectToMqtt() {
   // Connect to MQTT
   client.setServer("io.adafruit.com", 1883);
   client.setCallback(mqttCallback);
-  if (client.connect("moth-net-cli", AIOUSER.c_str(), AIOKEY.c_str())) {
-    Serial.println("Connected to MQTT server");
-    //Test led feed
-    feedName = AIOUSER + String("/feeds/moth-hub-led");
-    client.subscribe(feedName.c_str());
-    //Default feed
-    feedName = "moth-net.newsensor";
-    subscribeToFeed(feedName);
-    //Subscribe to all feeds
-    String feedIn = getFeeds();
-    DeserializationError error = deserializeJson(feeds, feedIn);
-    // Test if parsing succeeds.
-    if (error) {
-      Serial.print(F("deserializeJson() failed: "));
-      Serial.println(error.f_str());
+  if (getAIOUser() != "" && getAIOKey() != "") {
+    if (client.connect("moth-net-cli", getAIOUser().c_str(), getAIOKey().c_str())) {
+      Serial.println("Connected to MQTT server");
+      isConnectedAIO = true;
+      //Test led feed
+      feedName = getAIOUser() + String("/feeds/moth-hub-led");
+      client.subscribe(feedName.c_str());
+      //Default feed
+      feedName = "moth-net.newsensor";
+      subscribeToFeed(feedName);
+      feedName = "";
+      //Subscribe to all feeds
+      String feedIn = getFeeds();
+      feeds.clear();
+      DeserializationError error = deserializeJson(feeds, feedIn);
+      // Test if parsing succeeds.
+      if (error) {
+        Serial.print(F("deserializeJson() failed: "));
+        Serial.println(error.f_str());
+      }
+      Serial.print("You have ");
+      Serial.print(feeds.size());
+      Serial.println(" feeds.");
+      for (int i = 0; i < feeds.size(); i++) {
+        subscribeToFeed(feeds[i]["name"]);
+      }
+      feeds.clear();
+      for (int i = 0; i < 3; i++) {
+        digitalWrite(LED_PIN, HIGH);
+        delay(50);
+        digitalWrite(LED_PIN, LOW);
+        delay(50);
+      }
     }
-    Serial.print("You have ");
-    Serial.print(feeds.size());
-    Serial.println(" feeds.");
-    for (int i = 0; i < feeds.size(); i++) {
-      subscribeToFeed(feeds[i]["name"]);
-    }
-    feeds.clear();
-    for (int i = 0; i < 3; i++) {
+    else {
+      Serial.println("Failed to connect to MQTT server!");
       digitalWrite(LED_PIN, HIGH);
-      delay(50);
+      delay(1000);
       digitalWrite(LED_PIN, LOW);
-      delay(50);
+      delay(1000);
     }
-  }
-  else {
-    Serial.println("Failed to connect to MQTT server!");
-    digitalWrite(LED_PIN, HIGH);
+  } else {
+    Serial.println("AIO credentials have no been set yet, please input them into the captive portal");
   }
 }
 
 void subscribeToFeed(String feedName) {
-  feedName = AIOUSER + "/feeds/" + feedName;
+  feedName = getAIOUser() + "/feeds/" + feedName;
   client.subscribe(feedName.c_str());
   Serial.print(feedName);
   Serial.println(" channel subscribed!");
@@ -78,7 +88,7 @@ void checkTopic(String topic) {
   Serial.println(topic);
   int macObject = doc.size();
   for (int i = 0; i < doc.size(); i++) {
-    String docString =  AIOUSER + "/feeds/";
+    String docString =  getAIOUser() + "/feeds/";
     docString = docString + doc[i]["feed"].as<String>();
     if ((docString == topic) && (doc[i]["sensorType"].as<int>() == (int)cam_photo || doc[i]["sensorType"].as<int>() == (int)servo)) {
       Serial.println("Matched connection");

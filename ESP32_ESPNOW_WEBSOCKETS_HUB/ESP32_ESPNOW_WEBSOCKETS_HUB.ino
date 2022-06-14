@@ -74,7 +74,7 @@ bool sendFeeds = false;
 bool connectedStatusSend = false;
 
 // JSON Docs
-StaticJsonDocument<6000> feeds;
+StaticJsonDocument<8000> feeds;
 DynamicJsonDocument feedsSimple(2000);
 DynamicJsonDocument macs(1000);
 StaticJsonDocument<1000> doc;
@@ -89,6 +89,10 @@ AceButton buttonBuiltIn(BTN_PIN);
 AsyncWebServer server(80);
 AsyncWebSocket ws("/ws");
 
+//AIO
+bool isConnectedAIO = false;
+
+
 void setup() {
 
   Serial.begin(115200); delay(500);
@@ -96,7 +100,7 @@ void setup() {
   initSPIFFS();
   initPrefs();
   Serial.println(loadJSON());
-  setNetwork(); //Only use when no UI to input credentials
+  //setNetwork(); //Only use when no UI to input credentials
 
   //We need to do wifi/espnow/wifi initialisation to get the wifi channel to be able to set sensors to the correct WiFi channel.
   initWiFi();

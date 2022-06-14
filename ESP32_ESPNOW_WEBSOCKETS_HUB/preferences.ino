@@ -95,3 +95,9 @@ void setNetwork() {
   preferences.putString("wifiSSID", String(WIFI_SSID));
   preferences.putString("wifiPASS", String(WIFI_PASS));
 }
+
+void setNetwork(String SSID, String PASS) {
+  preferences.putString("wifiSSID", SSID);
+  preferences.putString("wifiPASS", PASS);
+  Serial.println("Network has been set!");
+}

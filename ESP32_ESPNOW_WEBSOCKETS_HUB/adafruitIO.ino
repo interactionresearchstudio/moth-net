@@ -9,7 +9,7 @@ void createData(String feedname) {
   httpPost.begin(client, serverPath);
   // Specify content-type header
   httpPost.addHeader("Content-Type", "application/json");
-  httpPost.addHeader("X-AIO-Key", AIOKEY);
+  httpPost.addHeader("X-AIO-Key", getAIOKey().c_str());
   // Data to send with HTTP POST
   // '{"value": 42, "lat": 23.1, "lon": "-73.3"}'
   String httpRequestData = "{\"value\": 42}";
@@ -36,7 +36,7 @@ void createFeed(String feedname) {
   httpPost.begin(client, serverPath);
   // Specify content-type header
   httpPost.addHeader("Content-Type", "application/json");
-  httpPost.addHeader("X-AIO-Key", AIOKEY);
+  httpPost.addHeader("X-AIO-Key", getAIOKey().c_str());
   // Data to send with HTTP POST
   //{"feed": {"name": "Feed Name"}}
   String httpRequestData = "{\"feed\": {\"name\": \"" + feedname;
@@ -57,7 +57,8 @@ String getFeeds() {
   String payload = "";
 
   http.begin("https://io.adafruit.com/api/v2/vastltd/groups/moth-net/feeds/"); //Specify the URL and certificate
-  http.addHeader("X-AIO-Key", AIOKEY);
+  http.addHeader("X-AIO-Key", getAIOKey().c_str());
+  http.setConnectTimeout(10000);
   int httpCode = http.GET();                                                  //Make the request
 
   if (httpCode > 0) { //Check for the returning code
@@ -65,10 +66,9 @@ String getFeeds() {
     payload = http.getString();
     Serial.println(httpCode);
     //Serial.println(payload);
-  }
-
-  else {
+  } else {
     Serial.println("Error on HTTP request");
+    Serial.println(httpCode);
   }
 
   http.end(); //Free the resources
@@ -94,6 +94,7 @@ String getFeeds() {
   //Serial.println(sensor);
   feeds.clear();
   feedsSimple.clear();
+  payload = "";
   return sensor;
 }
 
@@ -164,4 +165,23 @@ String getFeedByMac(String mac) {
   }
   doc.clear();
   return "";
+}
+
+String getAIOUser() {
+  String out = preferences.getString("AIOUSER");
+  Serial.println(out);
+  return out;
+}
+
+String getAIOKey() {
+    String out = preferences.getString("AIOKEY");
+  Serial.println(out);
+  return out;
+}
+
+
+void setAIO(String USER, String KEY) {
+  preferences.putString("AIOUSER", USER);
+  preferences.putString("AIOKEY", KEY);
+  Serial.println("AIO has been set!");
 }
