@@ -98,8 +98,12 @@ void handleWebSocketMessage(void *arg, uint8_t *data, size_t len) {
           connectToMqtt();
         }
         connectedStatusSend = true;
-      }
-      else if (in.indexOf("networks") >= 0) {
+      } else if (in.indexOf("{\"") >= 0 && in.indexOf("mac") >= 0 ) {
+        Serial.println("it's device list");
+        in = in.substring(0, in.indexOf("}]"));
+        Serial.println("in");
+        updateJson(in.c_str());
+      } else if (in.indexOf("networks") >= 0) {
         // send network scan
         blinkLed(50);
         wifiScanSend = true;
@@ -189,6 +193,7 @@ void sendFeedsScan() {
   scan.toCharArray(buf, scan.length() + 1);
   ws.textAll(buf, scan.length());
   Serial.println(scan);
+  delete buf;
 }
 
 

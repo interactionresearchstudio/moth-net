@@ -9,7 +9,7 @@ void createData(String feedname) {
   httpPost.begin(client, serverPath);
   // Specify content-type header
   httpPost.addHeader("Content-Type", "application/json");
-  httpPost.addHeader("X-AIO-Key", AIOKEY);
+  httpPost.addHeader("X-AIO-Key", getAIOKey().c_str());
   // Data to send with HTTP POST
   // '{"value": 42, "lat": 23.1, "lon": "-73.3"}'
   String httpRequestData = "{\"value\": 42}";
@@ -36,7 +36,7 @@ void createFeed(String feedname) {
   httpPost.begin(client, serverPath);
   // Specify content-type header
   httpPost.addHeader("Content-Type", "application/json");
-  httpPost.addHeader("X-AIO-Key", AIOKEY);
+  httpPost.addHeader("X-AIO-Key", getAIOKey().c_str());
   // Data to send with HTTP POST
   //{"feed": {"name": "Feed Name"}}
   String httpRequestData = "{\"feed\": {\"name\": \"" + feedname;
@@ -57,7 +57,7 @@ String getFeeds() {
   String payload = "";
 
   http.begin("https://io.adafruit.com/api/v2/vastltd/groups/moth-net/feeds/"); //Specify the URL and certificate
-  http.addHeader("X-AIO-Key", AIOKEY);
+  http.addHeader("X-AIO-Key", getAIOKey().c_str());
   int httpCode = http.GET();                                                  //Make the request
 
   if (httpCode > 0) { //Check for the returning code
@@ -65,10 +65,9 @@ String getFeeds() {
     payload = http.getString();
     Serial.println(httpCode);
     //Serial.println(payload);
-  }
-
-  else {
+  } else {
     Serial.println("Error on HTTP request");
+    Serial.println(httpCode);
   }
 
   http.end(); //Free the resources
@@ -94,6 +93,7 @@ String getFeeds() {
   //Serial.println(sensor);
   feeds.clear();
   feedsSimple.clear();
+  delete payload;
   return sensor;
 }
 
@@ -167,11 +167,15 @@ String getFeedByMac(String mac) {
 }
 
 String getAIOUser() {
-  return preferences.getString("AIOUSER");
+  String out = preferences.getString("AIOUSER");
+  Serial.println(out);
+  return out;
 }
 
 String getAIOKey() {
-  return preferences.getString("AIOKEY");
+    String out = preferences.getString("AIOKEY");
+  Serial.println(out);
+  return out;
 }
 
 

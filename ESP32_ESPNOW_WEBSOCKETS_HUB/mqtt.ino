@@ -29,7 +29,7 @@ void connectToMqtt() {
       Serial.println("Connected to MQTT server");
       isConnectedAIO = true;
       //Test led feed
-      feedName = AIOUSER + String("/feeds/moth-hub-led");
+      feedName = getAIOUser() + String("/feeds/moth-hub-led");
       client.subscribe(feedName.c_str());
       //Default feed
       feedName = "moth-net.newsensor";
@@ -69,7 +69,7 @@ void connectToMqtt() {
 }
 
 void subscribeToFeed(String feedName) {
-  feedName = AIOUSER + "/feeds/" + feedName;
+  feedName = getAIOUser() + "/feeds/" + feedName;
   client.subscribe(feedName.c_str());
   Serial.print(feedName);
   Serial.println(" channel subscribed!");
@@ -86,7 +86,7 @@ void checkTopic(String topic) {
   Serial.println(topic);
   int macObject = doc.size();
   for (int i = 0; i < doc.size(); i++) {
-    String docString =  AIOUSER + "/feeds/";
+    String docString =  getAIOUser() + "/feeds/";
     docString = docString + doc[i]["feed"].as<String>();
     if ((docString == topic) && (doc[i]["sensorType"].as<int>() == (int)cam_photo || doc[i]["sensorType"].as<int>() == (int)servo)) {
       Serial.println("Matched connection");
