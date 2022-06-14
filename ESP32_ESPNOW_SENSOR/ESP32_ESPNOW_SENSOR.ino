@@ -19,7 +19,7 @@ bool isReceivedMsg = false;
 int setWifi = 0;
 
 uint8_t baseMac[6];
-#define LED_PIN   2
+#define LED   2
 int BTN_PIN =   0;
 //SET BASED OFF HUB
 #define CHANNEL 1
@@ -79,22 +79,10 @@ esp_now_peer_info_t peerInfo;
 // ----------------------------------------------------------------------------
 // Definition of the LED component
 // ----------------------------------------------------------------------------
-struct Led {
-  // state variables
-  uint8_t pin;
-  bool    on;
-
-  // methods
-  void update() {
-    digitalWrite(pin, on ? HIGH : LOW);
-  }
-};
 
 // ----------------------------------------------------------------------------
 // Definition of global variables
 // ----------------------------------------------------------------------------
-Led    led         = { LED_PIN, false };
-
 // ----------------------------------------------------------------------------
 // SPIFFS initialization
 // ----------------------------------------------------------------------------
@@ -185,9 +173,9 @@ void initWiFi() {
 // ----------------------------------------------------------------------------
 
 void setup() {
-  pinMode(led.pin,         OUTPUT);
+  pinMode(LED,         OUTPUT);
   pinMode(BTN_PIN,      INPUT);
-
+  buttonBuiltIn.init(BTN_PIN,HIGH);
   ButtonConfig* buttonConfigBuiltIn = buttonBuiltIn.getButtonConfig();
   buttonConfigBuiltIn->setEventHandler(handleButtonEvent);
   buttonConfigBuiltIn->setFeature(ButtonConfig::kFeatureClick);
@@ -226,7 +214,6 @@ void loop() {
     isPressed = false;
   }
   delay(30);
-  // led.update();
   checkChannel();
 }
 
@@ -295,9 +282,9 @@ void onDataReceive(const uint8_t * mac_addr, const uint8_t *incomingData, int le
 }
 
 void blinkLed() {
-  digitalWrite(LED_PIN, 1);
+  digitalWrite(LED, 1);
   delay(40);
-  digitalWrite(LED_PIN, 0);
+  digitalWrite(LED, 0);
 }
 
 void sendESPNOW() {
@@ -365,6 +352,7 @@ bool isLong = false;
 // button functions
 void handleButtonEvent(AceButton* button, uint8_t eventType, uint8_t buttonState) {
   switch (button->getPin()) {
+    Serial.println("got event");
     case 0:
       switch (eventType) {
         case AceButton::kEventPressed:

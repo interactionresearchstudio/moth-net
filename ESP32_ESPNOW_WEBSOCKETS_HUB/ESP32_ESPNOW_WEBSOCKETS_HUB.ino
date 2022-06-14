@@ -71,6 +71,7 @@ PubSubClient client(espClient);
 bool wifiScanSend = false;
 bool sensorScanSend = false;
 bool sendFeeds = false;
+bool connectedStatusSend = false;
 
 // JSON Docs
 StaticJsonDocument<6000> feeds;
@@ -95,7 +96,7 @@ void setup() {
   initSPIFFS();
   initPrefs();
   Serial.println(loadJSON());
- // setNetwork(); //Only use when no UI to input credentials
+  setNetwork(); //Only use when no UI to input credentials
 
   //We need to do wifi/espnow/wifi initialisation to get the wifi channel to be able to set sensors to the correct WiFi channel.
   initWiFi();

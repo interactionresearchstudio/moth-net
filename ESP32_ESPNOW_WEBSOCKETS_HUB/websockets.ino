@@ -1,3 +1,11 @@
+/*to do
+ * -replace json of devices I get
+ * -better way of looking for json and strings
+ * -implement SSID and PASS populating
+ * -implement aiouser and aiokey 
+ * -implement aio_connected and wifi_connected
+ */
+
 
 void notifyClients() {
   String out = getFeeds();
@@ -14,42 +22,92 @@ void notifyClients() {
   //connections.json from UI to replace
 */
 /*ESP sends
-    {"aio_connected": true, "wifi_connected": true}
-    {"SSID":"VASTNET"},{"SSID":"NU Simply Web"},{"SSID":"WiFi Guest"},{"SSID":"eduroam"},{"SSID":"NU IOT"}
-    {"name":"djfdsj"},{"name":"djshdf"},{"name":"dffsds"}
-    {"name":"New Device","mac":"ac:67:b2:2b:19:2c","feed":"moth-net.newsensor","sensorType":5,"value":"99","connected":true},{"name":"New Device","mac":"f0:08:d1:d7:67:dc","feed":"moth-net.newsensor","sensorType":0,"value":"99"}
+   status: {"aio_connected": true, "wifi_connected": true}
+   networks:  {"SSID":"VASTNET"},{"SSID":"NU Simply Web"},{"SSID":"WiFi Guest"},{"SSID":"eduroam"},{"SSID":"NU IOT"}
+   feeds: {"feedName":"djfdsj"},{"name":"djshdf"},{"name":"dffsds"}
+   devices: {"name":"New Device","mac":"ac:67:b2:2b:19:2c","feed":"moth-net.newsensor","sensorType":5,"value":"99","connected":true},{"name":"New Device","mac":"f0:08:d1:d7:67:dc","feed":"moth-net.newsensor","sensorType":0,"value":"99"}
 */
 
 void handleWebSocketMessage(void *arg, uint8_t *data, size_t len) {
   AwsFrameInfo *info = (AwsFrameInfo*)arg;
   if (info->final && info->index == 0 && info->len == len && info->opcode == WS_TEXT) {
 
-    const uint8_t size = JSON_OBJECT_SIZE(2);
-    StaticJsonDocument<size> json;
-    DeserializationError err = deserializeJson(json, data);
-    if (err) {
-      Serial.print(F("deserializeJson() failed with code "));
-      Serial.println(err.c_str());
-      return;
+    /* const uint8_t size = JSON_OBJECT_SIZE(2);
+      StaticJsonDocument<size> json;
+      DeserializationError err = deserializeJson(json, data);
+      if (err) {
+       Serial.print(F("deserializeJson() failed with code "));
+       Serial.println(err.c_str());
+       return;
+      }
+      Serial.println((char*)data);
+      const char *action = json["action"];
+      int testIn = json["test"];
+      Serial.println(testIn);
+      if (strcmp(action, "toggle") == 0) {
+       sendBlink();
+       blinkLed(50);
+       wifiScanSend = true;
+      } else  if (strcmp(action, "toggle2") == 0) {
+       sendBlink();
+       blinkLed(50);
+       sensorScanSend = true;
+      } else  if (strcmp(action, "toggle3") == 0) {
+       sendBlink();
+       blinkLed(50);
+       sendFeeds = true;
+      }
+    */
+    String in = String((char*)data);
+    Serial.println(in);
+    if (len > 2) {
+      if (in.indexOf("{\"") >= 0 && in.indexOf("SSID") >= 0 ) {
+        Serial.println("it's networks");
+        const uint8_t size = JSON_OBJECT_SIZE(2);
+        StaticJsonDocument<size> json;
+        DeserializationError err = deserializeJson(json, data);
+        if (err) {
+          Serial.print(F("deserializeJson() failed with code "));
+          Serial.println(err.c_str());
+          return;
+        }
+        const char *SSIDIN = json["SSID"];
+        Serial.println(SSIDIN);
+        const char *PASSIN = json["PASS"];
+        Serial.println(PASSIN);
+      } else if (in.indexOf("{\"") >= 0 && in.indexOf("aio_user") >= 0 ) {
+        Serial.println("it's a json");
+        const uint8_t size = JSON_OBJECT_SIZE(2);
+        StaticJsonDocument<size> json;
+        DeserializationError err = deserializeJson(json, data);
+        if (err) {
+          Serial.print(F("deserializeJson() failed with code "));
+          Serial.println(err.c_str());
+          return;
+        }
+        const char *aio_user = json["aio_user"];
+        Serial.println(aio_user);
+        const char *aio_key = json["aio_key"];
+        Serial.println(aio_key);
+      }
+      else if (in.indexOf("networks") >= 0) {
+        // send network scan
+        blinkLed(50);
+        wifiScanSend = true;
+      } else if (in.indexOf("status") >= 0) {
+        // send connected states
+        blinkLed(50);
+        connectedStatusSend = true;
+      } else if (in.indexOf("feeds") >= 0) {
+        // send feeds
+        blinkLed(50);
+        sendFeeds = true;
+      } else if (in.indexOf("devices") >= 0) {
+        //send devices
+        blinkLed(50);
+        sensorScanSend = true;
+      }
     }
-    Serial.println((char*)data);
-    const char *action = json["action"];
-    int testIn = json["test"];
-    Serial.println(testIn);
-    if (strcmp(action, "toggle") == 0) {
-      sendBlink();
-      blinkLed(50);
-      wifiScanSend = true;
-    } else  if (strcmp(action, "toggle2") == 0) {
-      sendBlink();
-      blinkLed(50);
-      sensorScanSend = true;
-    } else  if (strcmp(action, "toggle3") == 0) {
-      sendBlink();
-      blinkLed(50);
-      sendFeeds = true;
-    }
-
   }
 }
 
@@ -98,6 +156,15 @@ void sendSensorScan() {
   Serial.println(scan);
 }
 
+void sendConnectedStatus() {
+  char buf[200];
+  String out = "{\"aio_connected\": true, \"wifi_connected\": true}";
+  out.toCharArray(buf, out.length() + 1);
+  ws.textAll(buf, out.length());
+  Serial.println(out);
+}
+
+
 void sendFeedsScan() {
   char buf[2000];
   String scan = getFeeds();
@@ -112,12 +179,20 @@ void checkWebsocketRequests() {
   isWiFiScanReady();
   isSensorScanReady();
   isFeedsReady();
+  isConnectedStatusReady();
 }
 
 void isFeedsReady() {
   if (sendFeeds == true) {
     sendFeedsScan();
     sendFeeds = false;
+  }
+}
+
+void isConnectedStatusReady() {
+  if (connectedStatusSend == true) {
+    sendConnectedStatus();
+    connectedStatusSend = false;
   }
 }
 

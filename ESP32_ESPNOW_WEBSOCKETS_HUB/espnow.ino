@@ -204,7 +204,7 @@ void sendESPNowChannel(int channel) {
 
 unsigned long prevHeartbeat;
 #define HEARTBEATFREQ 10000
-#define HEARTBEATREQ_TIMEOUT 200
+#define HEARTBEATREQ_TIMEOUT 400
 unsigned long heartbeatReqMillis;
 bool heartbeatReqExpected = false;
 

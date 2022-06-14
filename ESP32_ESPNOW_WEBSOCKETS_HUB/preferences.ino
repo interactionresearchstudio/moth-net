@@ -68,7 +68,7 @@ String getScanAsJsonString() {
   StaticJsonDocument<1000> jsonDoc;
   getScanAsJson(jsonDoc);
   serializeJson(jsonDoc[0], jsonString);
-
+  jsonDoc.clear();
   return (jsonString);
 }
 

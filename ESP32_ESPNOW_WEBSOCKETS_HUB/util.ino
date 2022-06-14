@@ -25,7 +25,6 @@ void handleButtonEvent(AceButton* button, uint8_t eventType, uint8_t buttonState
     case 0:
       switch (eventType) {
         case AceButton::kEventPressed:
-          notifyClients();
           if (insertFeed("newsensor") == true) {
             blinkLed(100);
           }
