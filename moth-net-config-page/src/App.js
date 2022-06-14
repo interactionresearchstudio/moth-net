@@ -22,16 +22,20 @@ function App() {
   const [isWifiConnected, setWifiConnected] = useState(false);
   const [isScanning, setIsScanning] = useState(false);
   const [networks, setNetworks] = useState(['one', 'two', 'three']);
-  const [wifiCredentials, setWifiCredentials] = useState({
-    SSID: "",
-    PASS: ""
-  });
-  const [aioCredentials, setAioCredentials] = useState({
-    aio_user: "",
-    aio_key: ""
-  });
+  const [wifiSSID, setWifiSSID] = useState('');
+  const [wifiPass, setWifiPass] = useState('');
+  const [aioUsername, setAioUsername] = useState('');
+  const [aioKey, setAioKey] = useState('');
   const [devices, setDevices] = useState(
     [
+      {
+        name: "Capacitive sensor",
+        mac: "FF:FF:FF:FF:FF",
+        feed: "",
+        sensorType: "Input",
+        value: "",
+        connected: false
+      },
       {
         name: "Capacitive sensor",
         mac: "FF:FF:FF:FF:FF",
@@ -41,20 +45,10 @@ function App() {
         connected: true
       },
       {
-        name: "Capacitive sensor",
-        mac: "FF:FF:FF:FF:FF",
-        feed: "",
-        sensorType: 0,
-        value: "",
-        connected: true
-      },
-      {
         name: "Servo motor",
         mac: "FF:FF:FF:FF:FF",
-        type: "Output",
+        sensorType: "Input",
         feed: "",
-        optionLabel: "Swing (deg)",
-        optionValue: 45,
         connected: true
       }
     ]
@@ -89,33 +83,25 @@ function App() {
     setIsScanning(true);
   };
 
-  const handleAioUsernameChange = (e) => {
-    console.log(e.target.value);
-    let creds = aioCredentials;
-    creds.aio_user = e.target.value;
-    setAioCredentials(creds);
+  const handleAioFormChange = (e) => {
+    if (e.target.id === 'aioUsername') {
+      setAioUsername(e.target.value);
+    } else if (e.target.id === 'aioKey') {
+      setAioKey(e.target.value);
+    }
   };
 
-  const handleAioKeyChange = (e) => {
-    console.log(e.target.value);
-    let creds = aioCredentials;
-    creds.aio_key = e.target.value;
-    setAioCredentials(creds);
+  const handleWifiFormChange = (e) => {
+    if (e.target.id === "ssid") {
+      setWifiSSID(e.target.value);
+    } else if (e.target.id === "pass") {
+      setWifiPass(e.target.value);
+    }
   };
 
-  const handleNetworkChange = (e) => {
-    console.log(e.target.value);
-    let creds = wifiCredentials;
-    creds.SSID = e.target.value;
-    setWifiCredentials(creds);
-  };
-
-  const handlePasswordChange = (e) => {
-    console.log(e.target.value);
-    let creds = wifiCredentials;
-    creds.PASS = e.target.value;
-    setWifiCredentials(creds);
-  };
+  const handleFeedChange = (e) => {
+    console.log(e);
+  }
 
   return (
     <div className="App mt-5">
@@ -128,16 +114,18 @@ function App() {
               connected={isWifiConnected}
               onSubmit={onWifiSubmit}
               networks={networks}
-              onNetworkChange={handleNetworkChange}
-              onPasswordChange={handlePasswordChange}
+              onFormChange={handleWifiFormChange}
+              ssid={wifiSSID}
+              pass={wifiPass}
             />
             <div className='mt-5'></div>
             <h3>Adafruit IO Settings</h3>
             <AIOForm
               onSubmit={onAioSubmit}
               connected={isAioConnected}
-              onUsernameChange={handleAioUsernameChange}
-              onKeyChange={handleAioKeyChange}
+              onFormChange={handleAioFormChange}
+              username={aioUsername}
+              aioKey={aioKey}
             />
           </Col>
           <Col md='6' className='mt-5'>
@@ -150,7 +138,10 @@ function App() {
               {isScanning ? <Spinner animation="border" size="sm" as="span" /> : null}
               {isScanning ? ' Scanning...' : 'Scan'}
             </Button>
-            <DevicesAccordion devices={devices}/>
+            <DevicesAccordion 
+              devices={devices}
+              onFeedChange={handleFeedChange}
+            />
           </Col>
         </Row>
 
