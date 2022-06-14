@@ -34,8 +34,10 @@ void connectToMqtt() {
       //Default feed
       feedName = "moth-net.newsensor";
       subscribeToFeed(feedName);
+      feedName = "";
       //Subscribe to all feeds
       String feedIn = getFeeds();
+      feeds.clear();
       DeserializationError error = deserializeJson(feeds, feedIn);
       // Test if parsing succeeds.
       if (error) {

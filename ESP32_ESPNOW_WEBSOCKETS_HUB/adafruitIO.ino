@@ -58,6 +58,7 @@ String getFeeds() {
 
   http.begin("https://io.adafruit.com/api/v2/vastltd/groups/moth-net/feeds/"); //Specify the URL and certificate
   http.addHeader("X-AIO-Key", getAIOKey().c_str());
+  http.setConnectTimeout(10000);
   int httpCode = http.GET();                                                  //Make the request
 
   if (httpCode > 0) { //Check for the returning code
@@ -93,7 +94,7 @@ String getFeeds() {
   //Serial.println(sensor);
   feeds.clear();
   feedsSimple.clear();
-  delete payload;
+  payload = "";
   return sensor;
 }
 

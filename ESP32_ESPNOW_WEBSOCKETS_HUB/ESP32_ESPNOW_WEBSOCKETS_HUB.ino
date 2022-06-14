@@ -74,7 +74,7 @@ bool sendFeeds = false;
 bool connectedStatusSend = false;
 
 // JSON Docs
-StaticJsonDocument<6000> feeds;
+StaticJsonDocument<8000> feeds;
 DynamicJsonDocument feedsSimple(2000);
 DynamicJsonDocument macs(1000);
 StaticJsonDocument<1000> doc;
