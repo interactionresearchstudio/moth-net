@@ -61,7 +61,7 @@ jobs:
         run: |
           mkdir build
           echo "Compiling ${{github.repository}}..."
-          arduino-cli compile -v -b esp32:esp32:esp32 --build-properties build.partitions=minimal,upload.maximum_size=1966080 --output-dir build ESP32_ESPNOW_WEBSOCKETS_HUB
+          arduino-cli compile -v -b esp32:esp32:esp32 --build-properties build.partitions=minimal,upload.maximum_size=1966080 --output-dir build repository/ESP32_ESPNOW_WEBSOCKETS_HUB
 
       - name: Create spiffs binary
         run: |
