@@ -1,0 +1,132 @@
+name: Build firmware
+on: [push, pull_request, workflow_dispatch]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Project Repository
+        uses: actions/checkout@v2
+        with:
+          repository: ${{ github.repository }}
+          path: repository
+
+      - name: Setup node
+        uses: actions/setup-node@v1
+        with:
+          node-version: 12.x
+      
+      - name: Setup Arduino CLI
+        uses: arduino/setup-arduino-cli@v1.1.1
+
+      - name: Install Python
+        uses: actions/setup-python@v1
+        with:
+          python-version: '2.7'
+
+      - name: Install pyserial
+        run: |
+          pip install pyserial
+          echo ${{github.ref}}
+      
+      - name: Build React frontend
+        run: |
+          pushd repository/moth-net-config-page
+          npm i -y
+          CI=false npm run build
+          popd
+
+      - name: Install ESP32 platform
+        run: |
+          arduino-cli core update-index --additional-urls https://raw.githubusercontent.com/espressif/arduino-esp32/gh-pages/package_esp32_index.json
+          arduino-cli core install esp32:esp32@2.0.3 --additional-urls https://raw.githubusercontent.com/espressif/arduino-esp32/gh-pages/package_esp32_index.json
+
+      - name: Install libraries
+        run: |
+          arduino-cli lib install "ArduinoJson"
+          arduino-cli lib install "PubSubClient"
+          arduino-cli lib install "AceButton"
+
+      - name: Checkout ESPAsyncWebServer
+        uses: actions/checkout@v2
+        with:
+          repository: me-no-dev/ESPAsyncWebServer
+          path: ESPAsyncWebServer
+
+      - name: Checkout AsyncTCP
+        uses: actions/checkout@v2
+        with:
+          repository: me-no-dev/AsyncTCP
+          path: AsyncTCP
+
+      - name: Move libs to Arduino directory
+        run: |
+          mv ESPAsyncWebServer /home/runner/Arduino/libraries/ESPAsyncWebServer
+          mv AsyncTCP /home/runner/Arduino/libraries/AsyncTCP
+          
+      - name: Compile Hub
+        run: |
+          mkdir build
+          echo "Compiling ${{github.repository}}..."
+          arduino-cli compile -v -b esp32:esp32:esp32 --build-properties build.partitions=minimal,upload.maximum_size=1966080 --output-dir build repository/ESP32_ESPNOW_WEBSOCKETS_HUB
+
+      - name: Create spiffs binary
+        run: |
+          /home/runner/.arduino15/packages/esp32/tools/mkspiffs/0.2.3/mkspiffs -c repository/moth-net-config-page/build -b 4096 -p 256 -s 0xB0000 build/spiffs.bin
+
+      - name: Checkout esp_binary_merger
+        uses: actions/checkout@v2
+        with:
+          repository: vtunr/esp32_binary_merger
+          path: esp32_binary_merger
+
+      - name: Merge binaries
+        run: |
+          python esp32_binary_merger/merge_bin_esp.py \
+            --output_name app-combined.bin \
+            --bin_path /home/runner/.arduino15/packages/esp32/hardware/esp32/2.0.3/tools/sdk/esp32/bin/bootloader_dio_80m.bin build/ESP32_ESPNOW_WEBSOCKETS_HUB.ino.partitions.bin build/ESP32_ESPNOW_WEBSOCKETS_HUB.ino.bin build/spiffs.bin \
+            --bin_address 0x1000 0x8000 0x10000 0x150000
+          mv output/app-combined.bin build/app-combined.bin
+          mv build/ESP32_ESPNOW_WEBSOCKETS_HUB.ino.bin build/app.bin
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v2
+        with:
+          name: build
+          path: build/
+
+      - name: Create Release
+        id: create_release
+        uses: actions/create-release@v1
+        if: startsWith(github.ref, 'refs/tags/v')
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ github.ref }}
+          release_name: moth-net firmware ${{ github.ref }}
+          draft: true
+          prerelease: false
+
+      - name: Upload app-combined.bin to Release
+        id: upload-release-asset-1
+        uses: actions/upload-release-asset@v1
+        if: startsWith(github.ref, 'refs/tags/v')
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: build/app-combined.bin
+          asset_name: app-combined.bin
+          asset_content_type: application/octet-stream
+
+      - name: Upload app.bin to Release
+        id: upload-release-asset-2
+        uses: actions/upload-release-asset@v1
+        if: startsWith(github.ref, 'refs/tags/v')
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: build/app.bin
+          asset_name: app.bin
+          asset_content_type: application/octet-stream

@@ -9,15 +9,16 @@ import DevicesAccordion from './Components/DevicesAccordion';
 TODO: 
 [X] add wifi form into main page 
 [X] controlled forms
-[ ] esp sends a json object containing "SSID", "mac", "name", "aio_connected"
-[ ] ui sends {"SSID": "MyNetwork", "PASS": "MyPassword"}
-[ ] ui sends {"aio_user": "myaiouser", "aio_key": "myaiokey1234"}
-[ ] ui sends manipulated devices object
-[ ] delete device button
-[ ] websockets with data: networks, devices, feeds, status
+[X] esp sends a json object containing "SSID", "mac", "name", "aio_connected"
+[X] ui sends {"SSID": "MyNetwork", "PASS": "MyPassword"}
+[X] ui sends {"aio_user": "myaiouser", "aio_key": "myaiokey1234"}
+[X] ui sends manipulated devices object
+[ ] remove device button (only on disconnected devices)
+[ ] use dropdown device list to select which sensor an action should be connected to
+[X] websockets with data: networks, devices, feeds, status
 */
 
-const ws = new WebSocket("ws://192.168.0.48/ws");
+const ws = new WebSocket("ws://localhost/ws");
 
 function App() {
   const [isAioConnected, setAioConnected] = useState(false);
@@ -26,7 +27,7 @@ function App() {
   const [isWifiScanning, setIsWifiScanning] = useState(false);
   const [scanIntervalId, setScanIntervalId] = useState(null);
   const [scanWifiIntervalId, setScanWifiIntervalId] = useState(null);
-  const [networks, setNetworks] = useState([{SSID: 'one'}, {SSID: 'two'}, {SSID: 'three'}]);
+  const [networks, setNetworks] = useState([]);
   const [feeds, setFeeds] = useState([]);
   const [wifiSSID, setWifiSSID] = useState('');
   const [wifiPass, setWifiPass] = useState('');
@@ -80,6 +81,7 @@ function App() {
         } else if ('name' in json[0]) {
           console.log('Received feeds from aio!');
           setFeeds(json);
+          console.log(feeds);
         } else {
           console.log('Array with unknown structure. No data was updated.');
         }
@@ -97,11 +99,8 @@ function App() {
   };
 
   ws.onopen = (e) => {
-    // Send "networks"
-    // Send "status"
     console.log('Connected to WebSocket');
-    //ws.send("networks");
-    //ws.send("status");
+    ws.send("status");
   }
 
   const onAioSubmit = (e) => {
@@ -130,6 +129,7 @@ function App() {
   const handleWifiScan = (e) => {
     console.log('Start wifi scan');
     setIsWifiScanning(true);
+    setWifiConnected(false);
     ws.send("networks");
     let id = setInterval(() => {
       console.log('Requested networks');
@@ -139,6 +139,7 @@ function App() {
   }
 
   const handleAioFormChange = (e) => {
+    setAioConnected(false);
     if (e.target.id === 'aioUsername') {
       setAioUsername(e.target.value);
     } else if (e.target.id === 'aioKey') {
@@ -148,6 +149,7 @@ function App() {
 
   const handleWifiFormChange = (e) => {
     setIsWifiScanning(false);
+    setWifiConnected(false);
     clearInterval(scanWifiIntervalId);
     if (e.target.id === "ssid") {
       setWifiSSID(e.target.value);
