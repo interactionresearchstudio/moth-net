@@ -81,6 +81,7 @@ function App() {
         } else if ('name' in json[0]) {
           console.log('Received feeds from aio!');
           setFeeds(json);
+          console.log(feeds);
         } else {
           console.log('Array with unknown structure. No data was updated.');
         }
