@@ -1,9 +1,6 @@
 /*to do
    -replace json of devices I get
    -better way of looking for json and strings
-   -implement SSID and PASS populating
-   -implement aiouser and aiokey
-   -implement aio_connected and wifi_connected
 */
 
 
@@ -77,6 +74,7 @@ void handleWebSocketMessage(void *arg, uint8_t *data, size_t len) {
         Serial.println(PASSIN);
         setNetwork(SSIDIN, PASSIN);
         connectToRouter(String(SSIDIN), String(PASSIN), 60000);
+        setWifiChannel(WiFi.channel());
         connectedStatusSend = true;
         json.clear();
       } else if (in.indexOf("{\"") >= 0 && in.indexOf("aio_user") >= 0 ) {
@@ -173,9 +171,9 @@ void sendConnectedStatus() {
   if (isConnectedToInternet() && isConnectedToAIO()) {
     out = "{\"aio_connected\": true, \"wifi_connected\": true}";
   } else if (isConnectedToInternet() && isConnectedToAIO() == false) {
-    out = "{\"aio_connected\": true, \"wifi_connected\": false}";
-  } else if (isConnectedToInternet() == false && isConnectedToAIO()) {
     out = "{\"aio_connected\": false, \"wifi_connected\": true}";
+  } else if (isConnectedToInternet() == false && isConnectedToAIO()) {
+    out = "{\"aio_connected\": true, \"wifi_connected\": false}";
   } else if (isConnectedToInternet() == false && isConnectedToAIO() == false) {
     out = "{\"aio_connected\": false, \"wifi_connected\": false}";
   }

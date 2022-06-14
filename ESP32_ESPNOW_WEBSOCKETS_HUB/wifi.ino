@@ -30,7 +30,7 @@ void connectToRouter(String SSID, String PASS, unsigned long timeOut) {
   Serial.println("\n[*] Connecting to WiFi Network");
 
   unsigned long wifiTimeOut = millis();
-  while (WiFi.status() != WL_CONNECTED && millis() - wifiTimeOut > timeOut)
+  while (WiFi.status() != WL_CONNECTED && (millis() - wifiTimeOut < timeOut))
   {
     Serial.print(".");
     delay(100);
