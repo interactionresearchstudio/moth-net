@@ -13,11 +13,11 @@ TODO:
 [X] ui sends {"SSID": "MyNetwork", "PASS": "MyPassword"}
 [X] ui sends {"aio_user": "myaiouser", "aio_key": "myaiokey1234"}
 [X] ui sends manipulated devices object
-[ ] delete device button
+[ ] remove device button (only on disconnected devices)
 [X] websockets with data: networks, devices, feeds, status
 */
 
-const ws = new WebSocket("ws://192.168.4.1/ws");
+const ws = new WebSocket("ws://localhost/ws");
 
 function App() {
   const [isAioConnected, setAioConnected] = useState(false);
