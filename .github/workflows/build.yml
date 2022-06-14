@@ -53,9 +53,16 @@ jobs:
           repository: me-no-dev/ESPAsyncWebServer
           path: ESPAsyncWebServer
 
+      - name: Checkout AsyncTCP
+        uses: actions/checkout@v2
+        with:
+          repository: me-no-dev/AsyncTCP
+          path: AsyncTCP
+
       - name: Move libs to Arduino directory
         run: |
           mv ESPAsyncWebServer /home/runner/Arduino/libraries/ESPAsyncWebServer
+          mv AsyncTCP /home/runner/Arduino/libraries/AsyncTCP
           
       - name: Compile Hub
         run: |
