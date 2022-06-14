@@ -92,8 +92,8 @@ void getScanAsJson(JsonDocument& jsonDoc) {
 
 //For DEBUG
 void setNetwork() {
-  preferences.putString("wifiSSID", String(WIFI_SSID));
-  preferences.putString("wifiPASS", String(WIFI_PASS));
+  //preferences.putString("wifiSSID", String(WIFI_SSID));
+ // preferences.putString("wifiPASS", String(WIFI_PASS));
 }
 
 void setNetwork(String SSID, String PASS) {
