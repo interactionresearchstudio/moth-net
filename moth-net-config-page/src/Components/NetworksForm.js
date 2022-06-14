@@ -15,7 +15,7 @@ function NetworksForm(props) {
                     >
                         <option value=''>Select a network</option>
                         {props.networks.map((network, index) => 
-                            <option value={network} key={index}>{network}</option>
+                            <option value={network.SSID} key={index}>{network.SSID}</option>
                         )}
                     </Form.Select>
                 </Form.Group>
