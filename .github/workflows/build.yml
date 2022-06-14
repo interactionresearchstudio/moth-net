@@ -3,15 +3,15 @@ on: [push, pull_request, workflow_dispatch]
 
 jobs:
   - name: Checkout Project Repository
-      uses: actions/checkout@v2
-      with:
-        repository: ${{ github.repository }}
-        path: repository
+    uses: actions/checkout@v2
+    with:
+      repository: ${{ github.repository }}
+      path: repository
 
   - name: Setup node
-      uses: actions/setup-node@v1
-      with:
-        node-version: 12.x
+    uses: actions/setup-node@v1
+    with:
+      node-version: 12.x
   
   - name: Setup Arduino CLI
       uses: arduino/setup-arduino-cli@v1.1.1
