@@ -7,7 +7,7 @@ void mqttCallback(char* topic, byte* payload, unsigned int length) {
   }
   Serial.println();
   String topicIn = String(topic);
-  if (topicIn == (AIOUSER + "/feeds/moth-hub-led")) {
+  if (topicIn == (getAIOUser() + "/feeds/moth-hub-led")) {
     if ((char)payload[0] == '1') {
       blinkLed(50);
       sendBlink();
