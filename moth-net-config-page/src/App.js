@@ -9,12 +9,12 @@ import DevicesAccordion from './Components/DevicesAccordion';
 TODO: 
 [X] add wifi form into main page 
 [X] controlled forms
-[ ] esp sends a json object containing "SSID", "mac", "name", "aio_connected"
-[ ] ui sends {"SSID": "MyNetwork", "PASS": "MyPassword"}
-[ ] ui sends {"aio_user": "myaiouser", "aio_key": "myaiokey1234"}
-[ ] ui sends manipulated devices object
+[X] esp sends a json object containing "SSID", "mac", "name", "aio_connected"
+[X] ui sends {"SSID": "MyNetwork", "PASS": "MyPassword"}
+[X] ui sends {"aio_user": "myaiouser", "aio_key": "myaiokey1234"}
+[X] ui sends manipulated devices object
 [ ] delete device button
-[ ] websockets with data: networks, devices, feeds, status
+[X] websockets with data: networks, devices, feeds, status
 */
 
 const ws = new WebSocket("ws://192.168.0.48/ws");
