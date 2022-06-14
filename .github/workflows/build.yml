@@ -33,7 +33,7 @@ jobs:
         run: |
           pushd repository/moth-net-config-page
           npm i -y
-          npm run build
+          CI=false npm run build
           popd
 
       - name: Install ESP32 platform
