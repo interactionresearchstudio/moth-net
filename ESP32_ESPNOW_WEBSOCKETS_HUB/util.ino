@@ -25,9 +25,7 @@ void handleButtonEvent(AceButton* button, uint8_t eventType, uint8_t buttonState
     case 0:
       switch (eventType) {
         case AceButton::kEventPressed:
-          if (insertFeed("newsensor") == true) {
-            blinkLed(100);
-          }
+          getFeeds();
           break;
         case AceButton::kEventReleased:
           break;
@@ -58,7 +56,7 @@ String loadJSON() {
   return out;
 }
 
-void updateJson(char* jsonIn) {
+void updateJson(const char* jsonIn) {
   SPIFFS.remove("/json/connections.json");
   File file = SPIFFS.open("/json/connections.json", FILE_WRITE);
   if (!file) {

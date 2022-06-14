@@ -7,7 +7,7 @@ void initWiFi() {
   Serial.print("[+] AP Created with IP Gateway ");
   Serial.println(WiFi.softAPIP());
 
-  if (getNetworkSSID() != "" && getNetworkSSID() != "") {
+  if (getNetworkSSID() != "" && getNetworkPASS() != "") {
     String ssid = getNetworkSSID();
     String pass = getNetworkPASS();
     connectToRouter(ssid.c_str(), pass.c_str(), 60000);
@@ -30,7 +30,7 @@ void connectToRouter(String SSID, String PASS, unsigned long timeOut) {
   Serial.println("\n[*] Connecting to WiFi Network");
 
   unsigned long wifiTimeOut = millis();
-  while (WiFi.status() != WL_CONNECTED)
+  while (WiFi.status() != WL_CONNECTED && (millis() - wifiTimeOut < timeOut))
   {
     Serial.print(".");
     delay(100);
@@ -47,4 +47,8 @@ void connectToRouter(String SSID, String PASS, unsigned long timeOut) {
 
 bool isConnectedToInternet() {
   return isConnected;
+}
+
+bool isConnectedToAIO(){
+  return isConnectedAIO;
 }

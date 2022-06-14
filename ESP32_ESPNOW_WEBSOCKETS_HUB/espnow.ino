@@ -41,7 +41,9 @@ void publishSensorData(String mac, sensorTypes sensors , int event) {
   String aio_message = "{\"value\": " + String(event) + ",\"lat\": 51.516651, \"lon\": -0.076840}";
   String publishOut = getFeedByMac(mac);
   if (publishOut != "") {
-    client.publish((AIOUSER + String("/f/") + publishOut).c_str(), aio_message.c_str());
+    //should just do this when you receive it from the interface
+    insertFeed(publishOut);
+    client.publish((getAIOUser() + String("/f/") + publishOut).c_str(), aio_message.c_str());
   } else {
     Serial.println("no matching mac");
   }
