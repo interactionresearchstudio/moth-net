@@ -165,3 +165,18 @@ String getFeedByMac(String mac) {
   doc.clear();
   return "";
 }
+
+String getAIOUser() {
+  return preferences.getString("AIOUSER");
+}
+
+String getAIOKey() {
+  return preferences.getString("AIOKEY");
+}
+
+
+void setAIO(String USER, String KEY) {
+  preferences.putString("AIOUSER", USER);
+  preferences.putString("AIOKEY", KEY);
+  Serial.println("AIO has been set!");
+}

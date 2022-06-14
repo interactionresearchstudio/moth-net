@@ -1,4 +1,4 @@
-#define LONG_PRESS 5000
+ #define LONG_PRESS 5000
 
 void handleButtonEvent(AceButton*, uint8_t, uint8_t);
 

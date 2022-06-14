@@ -1,10 +1,10 @@
 /*to do
- * -replace json of devices I get
- * -better way of looking for json and strings
- * -implement SSID and PASS populating
- * -implement aiouser and aiokey 
- * -implement aio_connected and wifi_connected
- */
+   -replace json of devices I get
+   -better way of looking for json and strings
+   -implement SSID and PASS populating
+   -implement aiouser and aiokey
+   -implement aio_connected and wifi_connected
+*/
 
 
 void notifyClients() {
@@ -75,8 +75,12 @@ void handleWebSocketMessage(void *arg, uint8_t *data, size_t len) {
         Serial.println(SSIDIN);
         const char *PASSIN = json["PASS"];
         Serial.println(PASSIN);
+        setNetwork(SSIDIN, PASSIN);
+        connectToRouter(String(SSIDIN), String(PASSIN), 60000);
+        connectedStatusSend = true;
+        json.clear();
       } else if (in.indexOf("{\"") >= 0 && in.indexOf("aio_user") >= 0 ) {
-        Serial.println("it's a json");
+        Serial.println("it's AIO");
         const uint8_t size = JSON_OBJECT_SIZE(2);
         StaticJsonDocument<size> json;
         DeserializationError err = deserializeJson(json, data);
@@ -86,9 +90,16 @@ void handleWebSocketMessage(void *arg, uint8_t *data, size_t len) {
           return;
         }
         const char *aio_user = json["aio_user"];
+
         Serial.println(aio_user);
         const char *aio_key = json["aio_key"];
         Serial.println(aio_key);
+        setAIO(String(aio_user), String(aio_key));
+        json.clear();
+        if (isConnectedToAIO() == false) {
+          connectToMqtt();
+        }
+        connectedStatusSend = true;
       }
       else if (in.indexOf("networks") >= 0) {
         // send network scan
@@ -158,7 +169,16 @@ void sendSensorScan() {
 
 void sendConnectedStatus() {
   char buf[200];
-  String out = "{\"aio_connected\": true, \"wifi_connected\": true}";
+  String out;
+  if (isConnectedToInternet() && isConnectedToAIO()) {
+    out = "{\"aio_connected\": true, \"wifi_connected\": true}";
+  } else if (isConnectedToInternet() && isConnectedToAIO() == false) {
+    out = "{\"aio_connected\": true, \"wifi_connected\": false}";
+  } else if (isConnectedToInternet() == false && isConnectedToAIO()) {
+    out = "{\"aio_connected\": false, \"wifi_connected\": true}";
+  } else if (isConnectedToInternet() == false && isConnectedToAIO() == false) {
+    out = "{\"aio_connected\": false, \"wifi_connected\": false}";
+  }
   out.toCharArray(buf, out.length() + 1);
   ws.textAll(buf, out.length());
   Serial.println(out);
