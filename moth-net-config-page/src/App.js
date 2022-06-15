@@ -18,7 +18,7 @@ TODO:
 [X] websockets with data: networks, devices, feeds, status
 */
 
-const ws = new WebSocket("ws://127.0.0.1/ws");
+const ws = new WebSocket("ws://127.0.0.1:80/ws");
 
 function App() {
   const [isAioConnected, setAioConnected] = useState(false);
