@@ -40,23 +40,47 @@ void handleButtonEvent(AceButton* button, uint8_t eventType, uint8_t buttonState
 }
 // Loads the configuration from a file
 String loadJSON() {
-  String out;
+  String out = "";
   // Open file for reading
-  File file = SPIFFS.open("/json/connections.json");
+  File file = SPIFFS.open("/json/connections.json", FILE_READ);
   DeserializationError error = deserializeJson(doc, file);
-  if (error)
-    Serial.println(F("Failed to read file, using default configuration"));
-
-  //Serial.println(doc.as<String>());
-  Serial.println(doc.size());
-  out = doc.as<String>();
+  if (error) {
+    Serial.println(F("Failed to read JSON file, using default configuration"));
+  } else {
+    //Serial.println(doc.as<String>());
+    Serial.println(doc.size());
+    out = doc.as<String>();
+  }
+  file.close();
+  if (out == "") {
+    doc.clear();
+    File file2 = SPIFFS.open("/json/connections_backup.json", FILE_READ);
+    DeserializationError error = deserializeJson(doc, file2);
+    if (error) {
+      Serial.println(F("Failed to read backup JSON file, using default configuration"));
+    } else {
+      Serial.println(doc.size());
+      out = doc.as<String>();
+      Serial.println(out);
+    }
+    if (out == "") {
+      Serial.println("back up file also empty");
+    } else {
+      SPIFFS.remove("/json/connections_backup.json");
+      SPIFFS.remove("/json/connections.json");
+      SPIFFS.rename("/json/connections_backup.json", "/json/connections.json");
+      Serial.println("imported backup file");
+    }
+  }
+  doc.clear();
   // Close the file (Curiously, File's destructor doesn't close the file)
   //file.close();
-  doc.clear();
   return out;
 }
 
 void updateJson(const char* jsonIn) {
+  SPIFFS.remove("/json/connections_backup.json");
+  SPIFFS.rename("/json/connections.json", "/json/connections_backup.json");
   SPIFFS.remove("/json/connections.json");
   File file = SPIFFS.open("/json/connections.json", FILE_WRITE);
   if (!file) {
@@ -95,7 +119,7 @@ void saveJSON(char* macStr, sensorTypes sensor) {
     obj["feed"] = "moth-net.newsensor";
     obj["sensorType"] = (int)sensor;
     obj["value"] = "99";
-    obj["connected"] = false;
+    obj["connected"] = true;
   } else {
     if (doc[macObject]["sensorType"].as<int>() == (int)sensor) {
       Serial.println("found a match in the json file, no need to update");
@@ -108,10 +132,13 @@ void saveJSON(char* macStr, sensorTypes sensor) {
       doc[macObject]["feed"] = "moth-net.newsensor";
       doc[macObject]["sensorType"] = (int)sensor;
       doc[macObject]["value"] = "99";
-      doc[macObject]["connected"] = false;
+      doc[macObject]["connected"] = true;
     }
   }
   if (updateJson) {
+    SPIFFS.remove("/json/connections_backup.json");
+    SPIFFS.rename("/json/connections.json", "/json/connections_backup.json");
+    Serial.println("copied over to backup");
     SPIFFS.remove("/json/connections.json");
     File file2 = SPIFFS.open("/json/connections.json", FILE_WRITE);
     if (!file2) {
@@ -168,6 +195,9 @@ void setAllToUnconnected() {
   for (int i = 0; i < doc.size(); i++) {
     doc[i]["connected"] = false;
   }
+  SPIFFS.remove("/json/connections_backup.json");
+  SPIFFS.rename("/json/connections.json", "/json/connections_backup.json");
+  Serial.println("copied over to backup");
   SPIFFS.remove("/json/connections.json");
   File file2 = SPIFFS.open("/json/connections.json", FILE_WRITE);
   if (!file2) {
@@ -200,6 +230,9 @@ void setDeviceToConnected(char* macStr) {
       break;
     }
   }
+  SPIFFS.remove("/json/connections_backup.json");
+  SPIFFS.rename("/json/connections.json", "/json/connections_backup.json");
+  Serial.println("copied over to backup");
   SPIFFS.remove("/json/connections.json");
   File file2 = SPIFFS.open("/json/connections.json", FILE_WRITE);
   if (!file2) {
@@ -258,4 +291,13 @@ boolean array_cmp(uint8_t *a, uint8_t *b, int len_a, int len_b) {
   for (n = 0; n < len_a; n++) if (a[n] != b[n]) return false;
   //ok, if we have not returned yet, they are equal :)
   return true;
+}
+
+String generateID() {
+  //https://github.com/espressif/arduino-esp32/issues/3859#issuecomment-689171490
+  uint64_t chipID = ESP.getEfuseMac();
+  uint32_t low = chipID % 0xFFFFFFFF;
+  uint32_t high = (chipID >> 32) % 0xFFFFFFFF;
+  String out = String(low);
+  return  out;
 }

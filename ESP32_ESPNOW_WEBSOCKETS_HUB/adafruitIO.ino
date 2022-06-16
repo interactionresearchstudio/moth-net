@@ -56,7 +56,7 @@ String getFeeds() {
   HTTPClient http;
   String payload = "";
 
-  http.begin("https://io.adafruit.com/api/v2/vastltd/groups/moth-net/feeds/"); //Specify the URL and certificate
+  http.begin("https://io.adafruit.com/api/v2/vastltd/groups/moth-net/feeds"); //Specify the URL and certificate
   http.addHeader("X-AIO-Key", getAIOKey().c_str());
   http.setConnectTimeout(10000);
   int httpCode = http.GET();                                                  //Make the request
@@ -87,7 +87,7 @@ String getFeeds() {
   Serial.println(" feeds.");
   for (byte i = 0; i < feeds.size(); i++) {
     Serial.println(feeds[i]["name"].as<String>());
-    feedsSimple[i]["name"] = feeds[i]["name"].as<String>();
+    feedsSimple[i]["name"] = "moth-net."+feeds[i]["name"].as<String>();
   }
   String sensor = "";
   serializeJson(feedsSimple, sensor);
@@ -103,6 +103,7 @@ bool insertFeed(String feedName) {
   feedName.toLowerCase();
   feedName.trim();
   String feedIn = getFeeds();
+  feeds.clear();
   DeserializationError error = deserializeJson(feeds, feedIn);
   // Test if parsing succeeds.
   if (error) {
@@ -174,7 +175,8 @@ String getAIOUser() {
 }
 
 String getAIOKey() {
-    String out = preferences.getString("AIOKEY");
+  String out = preferences.getString("AIOKEY");
+  out.trim();
   Serial.println(out);
   return out;
 }

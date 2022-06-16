@@ -23,6 +23,11 @@ using namespace ace_button;
 
 */
 
+
+bool isSendingData = false;
+byte numConnectedDevices = 0;
+
+
 #define LED_PIN   2
 int BTN_PIN = 0;
 
@@ -62,8 +67,9 @@ uint8_t broadcastAddress[] = {0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF};
 uint8_t macToSend[6];
 
 //WiFi access point credentials
-const char *WIFI_SSID_AP = "ESP32";
+char *WIFI_SSID_AP = "MOTHNET-";
 const char *WIFI_PASS_AP = "password";
+String WIFI_AP_NAME;
 
 //MQTT
 WiFiClient espClient;
@@ -72,12 +78,15 @@ bool wifiScanSend = false;
 bool sensorScanSend = false;
 bool sendFeeds = false;
 bool connectedStatusSend = false;
+bool nameSend = false;
 
 // JSON Docs
 StaticJsonDocument<8000> feeds;
 DynamicJsonDocument feedsSimple(2000);
 DynamicJsonDocument macs(1000);
 StaticJsonDocument<1000> doc;
+DynamicJsonDocument connectedMacs(1000);
+JsonArray macsOnline;
 
 //Preferences
 Preferences preferences;
@@ -100,6 +109,7 @@ void setup() {
   initSPIFFS();
   initPrefs();
   Serial.println(loadJSON());
+  initConnectedMacJson();
   //setNetwork(); //Only use when no UI to input credentials
 
   //We need to do wifi/espnow/wifi initialisation to get the wifi channel to be able to set sensors to the correct WiFi channel.

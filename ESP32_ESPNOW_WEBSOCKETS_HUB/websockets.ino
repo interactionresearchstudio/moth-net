@@ -28,33 +28,6 @@ void notifyClients() {
 void handleWebSocketMessage(void *arg, uint8_t *data, size_t len) {
   AwsFrameInfo *info = (AwsFrameInfo*)arg;
   if (info->final && info->index == 0 && info->len == len && info->opcode == WS_TEXT) {
-
-    /* const uint8_t size = JSON_OBJECT_SIZE(2);
-      StaticJsonDocument<size> json;
-      DeserializationError err = deserializeJson(json, data);
-      if (err) {
-       Serial.print(F("deserializeJson() failed with code "));
-       Serial.println(err.c_str());
-       return;
-      }
-      Serial.println((char*)data);
-      const char *action = json["action"];
-      int testIn = json["test"];
-      Serial.println(testIn);
-      if (strcmp(action, "toggle") == 0) {
-       sendBlink();
-       blinkLed(50);
-       wifiScanSend = true;
-      } else  if (strcmp(action, "toggle2") == 0) {
-       sendBlink();
-       blinkLed(50);
-       sensorScanSend = true;
-      } else  if (strcmp(action, "toggle3") == 0) {
-       sendBlink();
-       blinkLed(50);
-       sendFeeds = true;
-      }
-    */
     String in = String((char*)data);
     Serial.println(in);
     if (len > 2) {
@@ -119,6 +92,10 @@ void handleWebSocketMessage(void *arg, uint8_t *data, size_t len) {
         //send devices
         blinkLed(50);
         sensorScanSend = true;
+      } else if (in.indexOf("devices") >= 0) {
+        blinkLed(50);
+        nameSend = true;
+
       }
     }
   }
@@ -162,6 +139,9 @@ void sendWiFiScan() {
 }
 
 void sendSensorScan() {
+  //setAllToUnconnected();
+  updateWithConnectedMacs();
+  
   String scan = loadJSON();
   char buf[2000];
   scan.toCharArray(buf, scan.length() + 1);
@@ -197,12 +177,22 @@ void sendFeedsScan() {
 }
 
 
+void sendName() {
+  char buf[50];
+  WIFI_AP_NAME.toCharArray(buf, WIFI_AP_NAME.length() + 1);
+  ws.textAll(buf, WIFI_AP_NAME.length());
+  Serial.println("sent wifi ssid");
+  delete buf;
+}
+
+
 //Functions triggered by buttons on webpage
 void checkWebsocketRequests() {
   isWiFiScanReady();
   isSensorScanReady();
   isFeedsReady();
   isConnectedStatusReady();
+  isNameSendReady();
 }
 
 void isFeedsReady() {
@@ -216,6 +206,13 @@ void isConnectedStatusReady() {
   if (connectedStatusSend == true) {
     sendConnectedStatus();
     connectedStatusSend = false;
+  }
+}
+
+void isNameSendReady() {
+  if (nameSend == true) {
+    sendName();
+    nameSend = false;
   }
 }
 

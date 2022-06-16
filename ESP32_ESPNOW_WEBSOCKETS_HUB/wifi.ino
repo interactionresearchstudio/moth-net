@@ -3,8 +3,11 @@ bool isConnected = false;
 void initWiFi() {
   WiFi.mode(WIFI_AP_STA);
   Serial.println("\n[*] Creating ESP32 AP");
-  WiFi.softAP(WIFI_SSID_AP, WIFI_PASS_AP);
-  Serial.print("[+] AP Created with IP Gateway ");
+  WIFI_AP_NAME = String(WIFI_SSID_AP) + "-" + generateID();
+  WiFi.softAP(WIFI_AP_NAME.c_str(), WIFI_PASS_AP);
+  Serial.print("[+] AP Created ");
+  Serial.print(WIFI_AP_NAME);
+  Serial.print(" with IP Gateway ");
   Serial.println(WiFi.softAPIP());
 
   if (getNetworkSSID() != "" && getNetworkPASS() != "") {
@@ -49,6 +52,6 @@ bool isConnectedToInternet() {
   return isConnected;
 }
 
-bool isConnectedToAIO(){
+bool isConnectedToAIO() {
   return isConnectedAIO;
 }

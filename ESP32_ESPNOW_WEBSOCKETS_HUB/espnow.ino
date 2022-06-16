@@ -22,14 +22,11 @@ void onDataReceive(const uint8_t * mac_addr, const uint8_t *incomingData, int le
     if (msg.function == heartbeat) {
       Serial.println("HeartBeat!");
       saveJSON(macStr, msg.sensors);
-      //  if (heartbeatReqExpected && millis() - heatbeatReqMillis < HEARTBEATREQ_TIMEOUT) {
-      //add mac to online list
-      //  } else {
-      //   heartbeatReqExpected = false;
-      //send online list to UI
-      //  }
-      setDeviceToConnected(macStr);
+      numConnectedDevices++;
+      addConnectedMac(macStr);
+      // setDeviceToConnected(macStr);
     } else if (msg.function == sensor) {
+      isSendingData = true;
       publishSensorData(macStr, msg.sensors, msg.eventVal);
     }
   }
@@ -41,12 +38,15 @@ void publishSensorData(String mac, sensorTypes sensors , int event) {
   String aio_message = "{\"value\": " + String(event) + ",\"lat\": 51.516651, \"lon\": -0.076840}";
   String publishOut = getFeedByMac(mac);
   if (publishOut != "") {
+    Serial.println("publishing data");
     //should just do this when you receive it from the interface
-    insertFeed(publishOut);
-    client.publish((getAIOUser() + String("/f/") + publishOut).c_str(), aio_message.c_str());
+    Serial.println(publishOut);
+    // insertFeed(publishOut);
+    client.publish((String("vastltd/f/") + publishOut).c_str(), aio_message.c_str());
   } else {
     Serial.println("no matching mac");
   }
+  isSendingData = false;
 }
 
 void singleChannelESPNOWStartup() {
@@ -211,14 +211,17 @@ unsigned long heartbeatReqMillis;
 bool heartbeatReqExpected = false;
 
 void heartBeatHandler() {
-  if (millis() - prevHeartbeat > HEARTBEATFREQ) {
-    Serial.println("Sending heartbeat REQ");
-    prevHeartbeat = millis();
-    setAllToUnconnected();
-    sendHeartbeatREQ();
-    heartbeatReqMillis = millis();
-    heartbeatReqExpected = true;
-
+  if (isSendingData == false) {
+    if (millis() - prevHeartbeat > HEARTBEATFREQ) {
+      Serial.println("Sending heartbeat REQ");
+      prevHeartbeat = millis();
+      clearConnectedMacs();
+      numConnectedDevices = 0;
+      // setAllToUnconnected();
+      sendHeartbeatREQ();
+      heartbeatReqMillis = millis();
+      heartbeatReqExpected = true;
+    }
   }
 }
 
@@ -232,4 +235,76 @@ void sendHeartbeatREQ() {
   else {
     Serial.println("Error sending the data");
   }
+}
+
+void initConnectedMacJson() {
+  macsOnline = connectedMacs.createNestedArray("macs");
+}
+
+void addConnectedMac(String macIn) {
+  bool exists = false;
+  if (macsOnline.size() == 0) {
+    Serial.println("adding to connected list");
+    macsOnline.add(macIn);
+  } else {
+    for (int i = 0; i < macsOnline.size(); i++) {
+      if (macsOnline[i].as<String>() == macIn && exists == false) {
+        Serial.println("already in connected list!");
+        exists = true;
+        break;
+      }
+    }
+    if (exists == false) {
+      Serial.println("adding to connected list");
+      macsOnline.add(macIn);
+    }
+  }
+}
+
+void clearConnectedMacs() {
+  for (int i = 0; i < macsOnline.size(); i++) {
+    Serial.println(macsOnline[i].as<String>());
+  }
+  macsOnline.clear();
+}
+
+void updateWithConnectedMacs() {
+  File file = SPIFFS.open("/json/connections.json", FILE_READ);
+  // Deserialize the JSON document
+  DeserializationError error = deserializeJson(doc, file);
+  if (error)
+    Serial.println(F("Failed to read file, using default configuration"));
+  file.close();
+
+  for (int i = 0; i < doc.size(); i++) {
+    doc[i]["connected"] = false;
+  }
+
+  // Open file for writing
+  int macObject = doc.size();
+  for (int i = 0; i < doc.size(); i++) {
+    for (int j = 0; j < macsOnline.size(); j++) {
+      if (doc[i]["mac"].as<String>() == macsOnline[j].as<String>()) {
+        Serial.println("matched a mac");
+        doc[i]["connected"] = true;
+      }
+    }
+  }
+  SPIFFS.remove("/json/connections_backup.json");
+  SPIFFS.rename("/json/connections.json", "/json/connections_backup.json");
+  Serial.println("copied over to backup");
+  SPIFFS.remove("/json/connections.json");
+  File file2 = SPIFFS.open("/json/connections.json", FILE_WRITE);
+  if (!file2) {
+    Serial.println(F("Failed to create file"));
+    return;
+  }
+  // Serialize JSON to file
+  if (serializeJson(doc, file2) == 0) {
+    Serial.println(F("Failed to write to file"));
+  }
+  // Close the file
+  file2.close();
+  doc.clear();
+  Serial.println("updated connections!");
 }
