@@ -67,7 +67,7 @@ uint8_t broadcastAddress[] = {0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF};
 uint8_t macToSend[6];
 
 //WiFi access point credentials
-char *WIFI_SSID_AP = "MOTHNET-";
+char *WIFI_SSID_AP = "MOTHNET";
 const char *WIFI_PASS_AP = "password";
 String WIFI_AP_NAME;
 
