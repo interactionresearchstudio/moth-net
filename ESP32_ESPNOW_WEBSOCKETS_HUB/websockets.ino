@@ -16,7 +16,7 @@ void notifyClients() {
     "networks", "devices", "feeds", "status"
   {"SSID":"FJFJJF","PASS": "FDKJFKJDFJK"};
   {"aio_user":"FJFJJF","aio_key": "FDKJFKJDFJK"};
-  //connections.json from UI to replace
+  ///json/connections.json from UI to replace
 */
 /*ESP sends
    status: {"aio_connected": true, "wifi_connected": true}

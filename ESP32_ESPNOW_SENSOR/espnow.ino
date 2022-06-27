@@ -2,7 +2,8 @@ void setEspNowChannel(int ch) {
   Serial.print("Channel: ");
   Serial.println(ch);
   setWifiChannel(ch);
-
+  esp_wifi_start();
+  esp_wifi_set_promiscuous(true);
   esp_wifi_set_channel(ch, WIFI_SECOND_CHAN_NONE);
 
   if (esp_now_is_peer_exist(broadcastAddress)) {

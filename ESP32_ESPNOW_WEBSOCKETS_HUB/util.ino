@@ -42,7 +42,7 @@ void handleButtonEvent(AceButton* button, uint8_t eventType, uint8_t buttonState
 String loadJSON() {
   String out = "";
   // Open file for reading
-  File file = SPIFFS.open("connections.json", FILE_READ);
+  File file = SPIFFS.open("/json/connections.json", FILE_READ);
   DeserializationError error = deserializeJson(doc, file);
   if (error) {
     Serial.println(F("Failed to read JSON file, using default configuration"));
@@ -54,7 +54,7 @@ String loadJSON() {
   file.close();
   if (out == "") {
     doc.clear();
-    File file2 = SPIFFS.open("connections_backup.json", FILE_READ);
+    File file2 = SPIFFS.open("/json/connections_backup.json", FILE_READ);
     DeserializationError error = deserializeJson(doc, file2);
     if (error) {
       Serial.println(F("Failed to read backup JSON file, using default configuration"));
@@ -66,7 +66,7 @@ String loadJSON() {
     file2.close();
     if (out == "") {
       Serial.println("back up file also empty");
-      File file = SPIFFS.open("connections.json", FILE_WRITE);
+      File file = SPIFFS.open("/json/connections.json", FILE_WRITE);
 
       if (!file) {
         Serial.println("There was an error opening the file for writing");
@@ -78,7 +78,7 @@ String loadJSON() {
         Serial.println("File write failed");
       }
       file.close();
-      file = SPIFFS.open("connections_backup.json", FILE_WRITE);
+      file = SPIFFS.open("/json/connections_backup.json", FILE_WRITE);
 
       if (!file) {
         Serial.println("There was an error opening the file for writing");
@@ -92,9 +92,8 @@ String loadJSON() {
       file.close();
 
     } else {
-      SPIFFS.remove("connections_backup.json");
-      SPIFFS.remove("connections.json");
-      SPIFFS.rename("connections_backup.json", "connections.json");
+      SPIFFS.remove("/json/connections.json");
+      SPIFFS.rename("/json/connections_backup.json", "/json/connections.json");
       Serial.println("imported backup file");
     }
   }
@@ -105,10 +104,10 @@ String loadJSON() {
 }
 
 void updateJson(const char* jsonIn) {
-  SPIFFS.remove("connections_backup.json");
-  SPIFFS.rename("connections.json", "connections_backup.json");
-  SPIFFS.remove("connections.json");
-  File file = SPIFFS.open("connections.json", FILE_WRITE);
+  SPIFFS.remove("/json/connections_backup.json");
+  SPIFFS.rename("/json/connections.json", "/json/connections_backup.json");
+  SPIFFS.remove("/json/connections.json");
+  File file = SPIFFS.open("/json/connections.json", FILE_WRITE);
   if (!file) {
     Serial.println(F("Failed to create file"));
     return;
@@ -120,7 +119,7 @@ void updateJson(const char* jsonIn) {
 
 void saveJSON(char* macStr, sensorTypes sensor) {
   bool updateJson = false;
-  File file = SPIFFS.open("connections.json", FILE_READ);
+  File file = SPIFFS.open("/json/connections.json", FILE_READ);
   // Deserialize the JSON document
   DeserializationError error = deserializeJson(doc, file);
   if (error)
@@ -162,11 +161,11 @@ void saveJSON(char* macStr, sensorTypes sensor) {
     }
   }
   if (updateJson) {
-    SPIFFS.remove("connections_backup.json");
-    SPIFFS.rename("onnections.json", "connections_backup.json");
+    SPIFFS.remove("/json/connections_backup.json");
+    SPIFFS.rename("onnections.json", "/json/connections_backup.json");
     Serial.println("copied over to backup");
-    SPIFFS.remove("/connections.json");
-    File file2 = SPIFFS.open("connections.json", FILE_WRITE);
+    SPIFFS.remove("/json/connections.json");
+    File file2 = SPIFFS.open("/json/connections.json", FILE_WRITE);
     if (!file2) {
       Serial.println(F("Failed to create file"));
       return;
@@ -209,7 +208,7 @@ String getNamefromSensor(sensorTypes sensor) {
 }
 
 void setAllToUnconnected() {
-  File file = SPIFFS.open("connections.json", FILE_READ);
+  File file = SPIFFS.open("/json/connections.json", FILE_READ);
   // Deserialize the JSON document
   DeserializationError error = deserializeJson(doc, file);
   if (error)
@@ -221,11 +220,11 @@ void setAllToUnconnected() {
   for (int i = 0; i < doc.size(); i++) {
     doc[i]["connected"] = false;
   }
-  SPIFFS.remove("connections_backup.json");
-  SPIFFS.rename("cconnections.json", "connections_backup.json");
+  SPIFFS.remove("/json/connections_backup.json");
+  SPIFFS.rename("/json/connections.json", "/json/connections_backup.json");
   Serial.println("copied over to backup");
-  SPIFFS.remove("connections.json");
-  File file2 = SPIFFS.open("connections.json", FILE_WRITE);
+  SPIFFS.remove("/json/connections.json");
+  File file2 = SPIFFS.open("/json/connections.json", FILE_WRITE);
   if (!file2) {
     Serial.println(F("Failed to create file"));
     return;
@@ -241,7 +240,7 @@ void setAllToUnconnected() {
 }
 
 void setDeviceToConnected(char* macStr) {
-  File file = SPIFFS.open("connections.json", FILE_READ);
+  File file = SPIFFS.open("/json/connections.json", FILE_READ);
   // Deserialize the JSON document
   DeserializationError error = deserializeJson(doc, file);
   if (error)
@@ -256,11 +255,11 @@ void setDeviceToConnected(char* macStr) {
       break;
     }
   }
-  SPIFFS.remove("connections_backup.json");
-  SPIFFS.rename("connections.json", "connections_backup.json");
+  SPIFFS.remove("/json/connections_backup.json");
+  SPIFFS.rename("/json/connections.json", "/json/connections_backup.json");
   Serial.println("copied over to backup");
-  SPIFFS.remove("connections.json");
-  File file2 = SPIFFS.open("connections.json", FILE_WRITE);
+  SPIFFS.remove("/json/connections.json");
+  File file2 = SPIFFS.open("/json/connections.json", FILE_WRITE);
   if (!file2) {
     Serial.println(F("Failed to create file"));
     return;
@@ -279,7 +278,7 @@ void getMacArray(int index) {
   //populates "macToSend" with the uint8_t array of the mac address
 
   // Open file for reading
-  File file = SPIFFS.open("connections.json", FILE_READ);
+  File file = SPIFFS.open("/json/connections.json", FILE_READ);
   // Deserialize the JSON document
   DeserializationError error = deserializeJson(doc, file);
   if (error)

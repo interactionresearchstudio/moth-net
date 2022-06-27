@@ -269,7 +269,7 @@ void clearConnectedMacs() {
 }
 
 void updateWithConnectedMacs() {
-  File file = SPIFFS.open("connections.json", FILE_READ);
+  File file = SPIFFS.open("/json/connections.json", FILE_READ);
   // Deserialize the JSON document
   DeserializationError error = deserializeJson(doc, file);
   if (error)
@@ -290,11 +290,11 @@ void updateWithConnectedMacs() {
       }
     }
   }
-  SPIFFS.remove("connections_backup.json");
-  SPIFFS.rename("connections.json", "connections_backup.json");
+  SPIFFS.remove("/json/connections_backup.json");
+  SPIFFS.rename("/json/connections.json", "/json/connections_backup.json");
   Serial.println("copied over to backup");
-  SPIFFS.remove("connections.json");
-  File file2 = SPIFFS.open("connections.json", FILE_WRITE);
+  SPIFFS.remove("/json/connections.json");
+  File file2 = SPIFFS.open("/json/connections.json", FILE_WRITE);
   if (!file2) {
     Serial.println(F("Failed to create file"));
     return;

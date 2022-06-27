@@ -39,47 +39,36 @@ void initPrefs() {
 }
 
 void readSensor() {
-  switch (DEVICE_TYPE) {
-    case cap_touch:
-      {
-        int touch = touchRead(T0);
-        if (touch < 50 && isPressed == false) {
-          isPressed = true;
-          sendSensor();
-        }
-        if (touch > 50 && isPressed == true) {
-          isPressed = false;
-        }
-      }
-      break;
-    case simple_switch:
-      {
-        int pressed = digitalRead(SENSOR_PIN);
-        if (pressed == false && isPressed == false) {
-          isPressed = true;
-          sendSensor();
-        }
-        if (pressed == true && isPressed == true) {
-          isPressed = false;
-        }
-      }
-      break;
-    case cam_movement:
-      {
-        //add camera movement
-      }
-      break;
-    case radar:
-      {
-        int pressed = digitalRead(SENSOR_PIN);
-        if (pressed == true && isPressed == false) {
-          isPressed = true;
-          sendSensor();
-        }
-        if (pressed == false && isPressed == true) {
-          isPressed = false;
-        }
-      }
-      break;
+#if(DEVICE_TYPE == cap_touch)
+  int touch = touchRead(T0);
+  if (touch < 50 && isPressed == false) {
+    isPressed = true;
+    sendSensor();
   }
+  if (touch > 50 && isPressed == true) {
+    isPressed = false;
+  }
+#elif(DEVICE_TYPE == simple_switch)
+  int pressed = digitalRead(SENSOR_PIN);
+  if (pressed == false && isPressed == false) {
+    isPressed = true;
+    sendSensor();
+  }
+  if (pressed == true && isPressed == true) {
+    isPressed = false;
+  }
+  delay(30);
+#elif(DEVICE_TYPE == cam_movement)
+  checkCam();
+#elif (DEVICE_TYPE == radar)
+  int pressed = digitalRead(SENSOR_PIN);
+  if (pressed == true && isPressed == false) {
+    isPressed = true;
+    sendSensor();
+  }
+  if (pressed == false && isPressed == true) {
+    isPressed = false;
+  }
+  delay(30);
+#endif
 }
