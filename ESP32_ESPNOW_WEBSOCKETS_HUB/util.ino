@@ -111,9 +111,11 @@ void updateJson(const char* jsonIn) {
   if (!file) {
     Serial.println(F("Failed to create file"));
     return;
+  } else {
+    file.print(jsonIn);
+    Serial.println("updated device connections");
+    // Close the file
   }
-  file.print(jsonIn);
-  // Close the file
   file.close();
 }
 
@@ -201,6 +203,15 @@ String getNamefromSensor(sensorTypes sensor) {
       break;
     case servo:
       result = "Servo";
+      break;
+    case servo_continuous:
+      result = "Servo Continuous";
+      break;
+    case on_pin:
+      result = "Pin";
+      break;
+    case hallEffect:
+      result = "HallEffect";
       break;
   }
 

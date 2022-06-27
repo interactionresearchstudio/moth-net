@@ -7,11 +7,6 @@
 #include <AceButton.h>
 using namespace ace_button;
 #define LONG_PRESS 2000
-#include <FastLED.h>
-// How many leds in your strip?
-#define NUM_LEDS 1
-// Define the array of leds
-CRGB leds[NUM_LEDS];
 #include <Preferences.h>
 Preferences prefs;
 // ----------------------------------------------------------------------------
@@ -23,25 +18,16 @@ int setWifi = 0;
 
 uint8_t baseMac[6];
 #define LED_PIN   2
+#define USER_PIN 4
 int BTN_PIN =   0;
 //SET BASED OFF HUB
 #define CHANNEL 1
 
 //Acebutton
 AceButton buttonBuiltIn(BTN_PIN);
-
 void handleButtonEvent(AceButton*, uint8_t, uint8_t);
-// ----------------------------------------------------------------------------
-// Definition of global constants
-// ----------------------------------------------------------------------------
-
 // REPLACE WITH THE MAC Address of your receiver
 uint8_t broadcastAddress[] = {0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF};
-
-
-// Button debouncing
-const uint8_t DEBOUNCE_DELAY = 10; // in milliseconds
-
 
 // ----------------------------------------------------------------------------
 // Definition of the ESPNOW struct
@@ -54,6 +40,9 @@ enum sensorTypes {
   radar,
   cam_photo,
   servo,
+  servo_continuous,
+  on_pin,
+  hallEffect
 };
 
 enum functionTypes {
@@ -65,7 +54,6 @@ enum functionTypes {
   heartbeatREQ
 };
 
-
 //Structure example to send data
 typedef struct struct_message {
   functionTypes function;
@@ -76,128 +64,27 @@ typedef struct struct_message {
 
 struct_message msg;
 struct_message outgoingReadings;
-
 esp_now_peer_info_t peerInfo;
 
-// ----------------------------------------------------------------------------
-// Definition of the LED component
-// ----------------------------------------------------------------------------
-struct Led {
-  // state variables
-  uint8_t pin;
-  bool    on;
 
-  // methods
-  void update() {
-    digitalWrite(pin, on ? HIGH : LOW);
-  }
-};
+#define ON_PIN_DEVICE
+#if defined(SERVO_DEVICE)
+#include <ESP32Servo.h>
+Servo myservo;
+#define DEVICE_TYPE servo
+#elif defined(CAM_PHOTO_DEVICE)
+#define DEVICE_TYPE cam_photo
+#elif defined(SERVO_CONTINUOUS_DEVICE)
+#include <ESP32Servo.h>
+Servo myservo;
+#define DEVICE_TYPE servo_continuous
+#elif defined(ON_PIN_DEVICE)
+#define DEVICE_TYPE on_pin
+#endif
 
-// ----------------------------------------------------------------------------
-// Definition of global variables
-// ----------------------------------------------------------------------------
-Led    led         = { LED_PIN, false };
-
-// ----------------------------------------------------------------------------
-// SPIFFS initialization
-// ----------------------------------------------------------------------------
-
-void initPrefs() {
-
-  prefs.begin("channelSettings");
-}
-
-// ----------------------------------------------------------------------------
-// Connecting to the ESPNOW
-// ----------------------------------------------------------------------------
-
-void setEspNowChannel(int ch) {
-  Serial.print("Channel: ");
-  Serial.println(ch);
-  setWifiChannel(ch);
-
-  esp_wifi_set_channel(ch, WIFI_SECOND_CHAN_NONE);
-
-  if (esp_now_is_peer_exist(broadcastAddress)) {
-    esp_now_del_peer(broadcastAddress);
-  }
-
-  // Register peer
-  memcpy(peerInfo.peer_addr, broadcastAddress, 6);
-  peerInfo.channel = ch;
-  peerInfo.encrypt = false;
-
-  // Add peer
-  if (esp_now_add_peer(&peerInfo) != ESP_OK) {
-    Serial.println("Failed to add peer");
-    return;
-  }
-
-
-}
-
-void initESPNOW() {
-
-
-  if (esp_now_init() == ESP_OK) {
-    Serial.println("ESPNow Init Success");
-  }
-  else {
-    Serial.println("ESPNow Init Failed");
-    //ESP.restart();
-  }
-
-  int ch = checkSavedChannel();
-  setEspNowChannel(ch);
-
-  esp_now_register_recv_cb(onDataReceive);
-  esp_now_register_send_cb(OnDataSent);
-
-}
-
-int checkSavedChannel() {
-  int chan = prefs.getInt("channel", 0);
-  if (chan == 0) {
-    Serial.println("no channel saved");
-    return CHANNEL;
-  } else {
-    Serial.print("connecting to channel ");
-    Serial.println(chan);
-    return chan;
-  }
-}
-
-void setSavedChannel(int chan) {
-  prefs.putInt("channel", chan);
-  Serial.println("saving channel to preferences");
-}
-
-
-
-// ----------------------------------------------------------------------------
-// Connecting to the WiFi network
-// ----------------------------------------------------------------------------
-
-void initWiFi() {
-  WiFi.mode(WIFI_STA);
-  WiFi.disconnect();
-}
-
-
-// ----------------------------------------------------------------------------
-// Initialization
-// ----------------------------------------------------------------------------
 
 void setup() {
-
-  FastLED.addLeds<NEOPIXEL, 4>(leds, NUM_LEDS);  // GRB ordering is assumed
-  leds[0] = CRGB::Red;
-  FastLED.show();
-  delay(50);
-  leds[0] = CRGB::Black;
-  FastLED.show();
-
-  pinMode(led.pin,         OUTPUT);
+  pinMode(LED_PIN,         OUTPUT);
   pinMode(BTN_PIN,      INPUT);
 
   ButtonConfig* buttonConfigBuiltIn = buttonBuiltIn.getButtonConfig();
@@ -208,194 +95,38 @@ void setup() {
   Serial.begin(115200); delay(500);
   randomSeed(analogRead(0));
 
-
+#if defined(SERVO_DEVICE)
+  ESP32PWM::allocateTimer(0);
+  ESP32PWM::allocateTimer(1);
+  ESP32PWM::allocateTimer(2);
+  ESP32PWM::allocateTimer(3);
+  myservo.setPeriodHertz(50);    // standard 50 hz servo
+  myservo.attach(USER_PIN, 1000, 2000);
+#elif defined(SERVO_CONTINUOUS_DEVICE)
+  ESP32PWM::allocateTimer(0);
+  ESP32PWM::allocateTimer(1);
+  ESP32PWM::allocateTimer(2);
+  ESP32PWM::allocateTimer(3);
+  myservo.setPeriodHertz(50);    // standard 50 hz servo
+  myservo.attach(USER_PIN, 1000, 2000);
+#elif defined(ON_PIN_DEVICE)
+  pinMode(USER_PIN, OUTPUT);
+  Serial.println("on pin!");
+#endif
   initPrefs();
   initWiFi();
-
 
   // Get MAC address for WiFi station
   esp_read_mac(baseMac, ESP_MAC_WIFI_STA);
   Serial.println(WiFi.macAddress());
   initESPNOW();
-
-
 }
-
 // ----------------------------------------------------------------------------
 // Main control loop
 // ----------------------------------------------------------------------------
 
 void loop() {
   buttonBuiltIn.check();
-
-  // led.update();
   delay(10);
   checkChannel();
-}
-
-void checkChannel() {
-  if (isReceivedMsg == false) {
-    if (millis() > MSGTIMEOUT) {
-      Serial.println("Never received heartbeat, setting back to channel 1");
-      setSavedChannel(1);
-      ESP.restart();
-    }
-  }
-}
-
-boolean array_cmp(uint8_t *a, uint8_t *b, int len_a, int len_b) {
-  int n;
-
-  // if their lengths are different, return false
-  if (len_a != len_b) return false;
-
-  // test each element to be the same. if not, return false
-  for (n = 0; n < len_a; n++) if (a[n] != b[n]) return false;
-
-  //ok, if we have not returned yet, they are equal :)
-  return true;
-}
-
-
-// On data received
-void onDataReceive(const uint8_t * mac_addr, const uint8_t *incomingData, int len) {
-  //Add CRC
-  if (len == sizeof(msg)) {
-    memcpy(&msg, incomingData, sizeof(msg));
-    char macStr[18];
-    snprintf(macStr, sizeof(macStr), "%02x:%02x:%02x:%02x:%02x:%02x",
-             mac_addr[0], mac_addr[1], mac_addr[2], mac_addr[3], mac_addr[4], mac_addr[5]);
-    Serial.print("Received from: ");
-    Serial.println(macStr);
-    Serial.print("Bytes received: ");
-    Serial.println(len);
-    Serial.print("Sensor type: ");
-    Serial.println(msg.sensors);
-    if (msg.function == wifiChannel) {
-      if (msg.eventVal != getWifiChannel()) {
-        setEspNowChannel(msg.eventVal);
-        setSavedChannel(msg.eventVal);
-        delay(5000);
-        sendHeartbeat();
-      }
-    } else if (msg.function == heartbeatREQ) {
-      isReceivedMsg = true;
-      //delay so they don't all send at the same time
-      delay(random(100));
-      sendHeartbeat();
-    } else if (msg.function == blinking) {
-      Serial.println("Blink!");
-      blinkLed();
-    }  else if (array_cmp(msg.mac, baseMac, 6, 6)) {
-      if (msg.function == action) {
-        Serial.println("led");
-        leds[0] = CRGB::Red;
-        FastLED.show();
-        delay(50);
-        leds[0] = CRGB::Black;
-        FastLED.show();
-      }
-    }
-  }
-}
-
-void blinkLed() {
-  digitalWrite(LED_PIN, 1);
-  delay(40);
-  digitalWrite(LED_PIN, 0);
-}
-
-void sendESPNOW() {
-  // Send message via ESP-NOW
-  outgoingReadings.function = heartbeat;
-  outgoingReadings.sensors = servo;
-  outgoingReadings.eventVal = 1;
-  esp_err_t result = esp_now_send(broadcastAddress, (uint8_t *) &outgoingReadings, sizeof(outgoingReadings));
-
-  if (result == ESP_OK) {
-    Serial.println("Sent with success");
-  }
-  else {
-    Serial.println("Error sending the data");
-  }
-}
-
-void sendSensor() {
-  // Send message via ESP-NOW
-
-  outgoingReadings.function = action;
-  outgoingReadings.sensors = servo;
-  outgoingReadings.eventVal = 1;
-  esp_err_t result = esp_now_send(broadcastAddress, (uint8_t *) &outgoingReadings, sizeof(outgoingReadings));
-
-  if (result == ESP_OK) {
-    Serial.println("Sent with success");
-  }
-  else {
-    Serial.println("Error sending the data");
-  }
-}
-
-
-void sendHeartbeat() {
-  // Send message via ESP-NOW
-  outgoingReadings.function = heartbeat;
-  outgoingReadings.sensors = servo;
-  outgoingReadings.eventVal = 1;
-  esp_err_t result = esp_now_send(broadcastAddress, (uint8_t *) &outgoingReadings, sizeof(outgoingReadings));
-
-  if (result == ESP_OK) {
-    Serial.println("Sent with success");
-  }
-  else {
-    Serial.println("Error sending the data");
-  }
-}
-
-String success;
-
-// Callback when data is sent
-void OnDataSent(const uint8_t *mac_addr, esp_now_send_status_t status) {
-  Serial.print("\r\nLast Packet Send Status:\t");
-  Serial.println(status == ESP_NOW_SEND_SUCCESS ? "Delivery Success" : "Delivery Fail");
-  if (status == 0) {
-    success = "Delivery Success :)";
-  }
-  else {
-    success = "Delivery Fail :(";
-  }
-}
-
-bool isLong = false;
-// button functions
-void handleButtonEvent(AceButton* button, uint8_t eventType, uint8_t buttonState) {
-  switch (button->getPin()) {
-    case 0:
-      switch (eventType) {
-        case AceButton::kEventPressed:
-          break;
-        case AceButton::kEventReleased:
-          if (isLong == false) {
-            sendESPNOW();
-          } else {
-            isLong = false;
-          }
-          break;
-        case AceButton::kEventLongPressed:
-          isLong = true;
-          // sendSensor();
-          break;
-        case AceButton::kEventRepeatPressed:
-          break;
-      }
-      break;
-  }
-}
-
-int getWifiChannel() {
-  return setWifi;
-}
-
-void setWifiChannel(int wifi) {
-  setWifi = wifi;
 }

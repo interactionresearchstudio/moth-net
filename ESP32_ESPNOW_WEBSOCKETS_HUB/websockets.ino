@@ -72,9 +72,9 @@ void handleWebSocketMessage(void *arg, uint8_t *data, size_t len) {
         }
         connectedStatusSend = true;
       } else if (in.indexOf("{\"") >= 0 && in.indexOf("mac") >= 0 ) {
-        Serial.println("it's device list");
-        in = in.substring(0, in.indexOf("}]"));
-        Serial.println("in");
+        Serial.println("it's the device list");
+        in = in.substring(0, in.indexOf("}]")+2);
+        Serial.println(in);
         updateJson(in.c_str());
       } else if (in.indexOf("networks") >= 0) {
         // send network scan
@@ -92,7 +92,7 @@ void handleWebSocketMessage(void *arg, uint8_t *data, size_t len) {
         //send devices
         blinkLed(50);
         sensorScanSend = true;
-      } else if (in.indexOf("devices") >= 0) {
+      } else if (in.indexOf("name") >= 0) {
         blinkLed(50);
         nameSend = true;
 

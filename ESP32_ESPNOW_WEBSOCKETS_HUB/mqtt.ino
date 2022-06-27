@@ -90,7 +90,7 @@ void checkTopic(String topic) {
   for (int i = 0; i < doc.size(); i++) {
     String docString =  getAIOUser() + "/feeds/";
     docString = docString + doc[i]["feed"].as<String>();
-    if ((docString == topic) && (doc[i]["sensorType"].as<int>() == (int)cam_photo || doc[i]["sensorType"].as<int>() == (int)servo)) {
+    if ((docString == topic) && (doc[i]["sensorType"].as<int>() == (int)cam_photo || doc[i]["sensorType"].as<int>() == (int)servo || doc[i]["sensorType"].as<int>() == (int)servo_continuous || doc[i]["sensorType"].as<int>() == (int)on_pin)) {
       Serial.println("Matched connection");
       macObject = i;
       sendSensorTo(macObject, doc[i]["sensorType"].as<int>(), 0);

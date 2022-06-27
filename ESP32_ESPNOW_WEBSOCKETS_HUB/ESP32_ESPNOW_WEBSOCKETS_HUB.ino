@@ -43,6 +43,9 @@ enum sensorTypes {
   radar,
   cam_photo,
   servo,
+  servo_continuous,
+  on_pin,
+  hallEffect
 };
 
 enum functionTypes {

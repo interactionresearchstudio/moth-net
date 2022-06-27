@@ -39,6 +39,9 @@ enum sensorTypes {
   radar,
   cam_photo,
   servo,
+  servo_continuous,
+  on_pin,
+  hallEffect,
 };
 
 typedef struct struct_message {
@@ -60,6 +63,8 @@ esp_now_peer_info_t peerInfo;
 #define DEVICE_TYPE simple_switch
 #elif defined(CAM_MOVEMENT_DEVICE)
 #define DEVICE_TYPE cam_movement
+#elif defined(RADAR_DEVICE)
+#define DEVICE_TYPE radar
 #elif defined(RADAR_DEVICE)
 #define DEVICE_TYPE radar
 #endif
