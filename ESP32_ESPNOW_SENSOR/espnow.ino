@@ -124,7 +124,7 @@ void onDataReceive(const uint8_t * mac_addr, const uint8_t *incomingData, int le
 void sendHeartbeat() {
   // Send message via ESP-NOW
   outgoingReadings.function = heartbeat;
-  outgoingReadings.sensors = cap_touch;
+  outgoingReadings.sensors = DEVICE_TYPE;
   outgoingReadings.eventVal = 1;
   esp_err_t result = esp_now_send(broadcastAddress, (uint8_t *) &outgoingReadings, sizeof(outgoingReadings));
 

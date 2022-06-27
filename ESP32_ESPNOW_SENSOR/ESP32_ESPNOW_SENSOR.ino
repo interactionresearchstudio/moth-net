@@ -52,29 +52,38 @@ struct_message msg;
 struct_message outgoingReadings;
 esp_now_peer_info_t peerInfo;
 
-#define DEVICE_TYPE cam_movement
+#define CAP_TOUCH_DEVICE
 
+#if defined(CAP_TOUCH_DEVICE)
+#define DEVICE_TYPE cap_touch
+#elif defined(SIMPLE_SWITCH_DEVICE)
+#define DEVICE_TYPE simple_switch
+#elif defined(CAM_MOVEMENT_DEVICE)
+#define DEVICE_TYPE cam_movement
+#elif defined(RADAR_DEVICE)
+#define DEVICE_TYPE radar
+#endif
+
+
+bool isPressed = false;
 
 //util
-#if(DEVICE_TYPE == cam_movement)
-#define LED   4
-bool isPressed = false;
+#if defined(CAM_MOVEMENT_DEVICE)
+#define LED 4
 #define SENSOR_PIN -1
+int BTN_PIN =   -1;
 #else
-#define LED   2
+#define LED  2
 int BTN_PIN =   0;
-bool isPressed = false;
 #define SENSOR_PIN 4
 //Acebutton
 AceButton buttonBuiltIn(BTN_PIN);
 void handleButtonEvent(AceButton*, uint8_t, uint8_t);
 #endif
 
-
-
-#if(DEVICE_TYPE == cam_movement)
 #include "esp_camera.h"
 #include "camera_pins.h"
+
 #define FRAME_SIZE FRAMESIZE_QVGA
 #define WIDTH 320
 #define HEIGHT 240
@@ -84,21 +93,24 @@ void handleButtonEvent(AceButton*, uint8_t, uint8_t);
 #define BLOCK_DIFF_THRESHOLD 0.2
 #define IMAGE_DIFF_THRESHOLD 0.1
 //#define DEBUG 1
+
+
 uint16_t prev_frame[H][W] = { 0 };
 uint16_t current_frame[H][W] = { 0 };
+
 bool setup_camera(framesize_t);
 bool capture_still();
 bool motion_detect();
 void update_frame();
 void print_frame(uint16_t frame[H][W]);
-#endif
 
 
 void setup() {
-  // pinMode(LED,         OUTPUT);
-#if(DEVICE_TYPE != cam_movement)
+  Serial.begin(115200); delay(500);
+#ifndef CAM_MOVEMENT_DEVICE
+  Serial.println("not cap touch");
   randomSeed(analogRead(0));
-  pinMode(BTN_PIN,      INPUT);
+  pinMode(BTN_PIN, INPUT);
   buttonBuiltIn.init(BTN_PIN, HIGH);
   ButtonConfig* buttonConfigBuiltIn = buttonBuiltIn.getButtonConfig();
   buttonConfigBuiltIn->setEventHandler(handleButtonEvent);
@@ -108,7 +120,8 @@ void setup() {
 #else
   randomSeed(analogRead(4));
 #endif
-  Serial.begin(115200); delay(500);
+  pinMode(LED,         OUTPUT);
+
   initPrefs();
   initWiFi();
   //set random number for sending heartbeat
@@ -117,20 +130,28 @@ void setup() {
   Serial.println(WiFi.macAddress());
   initESPNOW();
 
-  if (DEVICE_TYPE == simple_switch) {
-    pinMode(SENSOR_PIN, INPUT_PULLUP);
-  } else if (DEVICE_TYPE == radar) {
-    pinMode(SENSOR_PIN, INPUT);
-  } else if (DEVICE_TYPE == cam_movement) {
-    Serial.println(setup_camera(FRAME_SIZE) ? "OK" : "ERR INIT");
-  }
+#if defined(SIMPLE_SWITCH_DEVICE)
+  pinMode(SENSOR_PIN, INPUT_PULLUP);
+#elif defined(RADAR_DEVICE)
+  pinMode(SENSOR_PIN, INPUT);
+#elif defined(CAM_MOVEMENT_DEVICE)
+  Serial.println(setup_camera(FRAME_SIZE) ? "OK" : "ERR INIT");
+#endif
 
 }
 void loop() {
-#if(DEVICE_TYPE != cam_movement)
+#ifndef CAM_MOVEMENT_DEVICE
   buttonBuiltIn.check();
 #endif
- // readSensor();
- checkCam();
+
+#if defined(CAM_MOVEMENT_DEVICE)
+  checkCam();
+#elif defined(SIMPLE_SWITCH_DEVICE)
+  checkSwitch();
+#elif defined(CAP_TOUCH_DEVICE)
+  checkCap();
+#elif defined(RADAR_DEVICE)
+  checkRadar();
+#endif
   checkChannel();
 }

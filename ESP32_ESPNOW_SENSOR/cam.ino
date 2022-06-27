@@ -1,4 +1,4 @@
-
+#if defined(CAM_MOVEMENT_DEVICE)
 bool setup_camera(framesize_t frameSize) {
   camera_config_t config;
 
@@ -67,11 +67,7 @@ bool capture_still() {
     for (int x = 0; x < W; x++)
       current_frame[y][x] /= BLOCK_SIZE * BLOCK_SIZE;
 
-#if DEBUG
-  Serial.println("Current frame:");
-  print_frame(current_frame);
-  Serial.println("---------------");
-#endif
+
 
   esp_camera_fb_return(frame_buffer);
 
@@ -94,12 +90,7 @@ bool motion_detect() {
       float delta = abs(current - prev) / prev;
 
       if (delta >= BLOCK_DIFF_THRESHOLD) {
-#if DEBUG
-        Serial.print("diff\t");
-        Serial.print(y);
-        Serial.print('\t');
-        Serial.println(x);
-#endif
+
 
         changes += 1;
       }
@@ -157,3 +148,4 @@ void checkCam() {
   update_frame();
   Serial.println("=================");
 }
+#endif
