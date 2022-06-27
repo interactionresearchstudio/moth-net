@@ -143,7 +143,7 @@ bool insertFeed(String feedName) {
 }
 
 String getFeedByMac(String mac) {
-  File file = SPIFFS.open("/json/connections.json", FILE_READ);
+  File file = SPIFFS.open("connections.json", FILE_READ);
   DeserializationError error = deserializeJson(doc, file);
   // Test if parsing succeeds.
   if (error) {

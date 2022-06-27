@@ -79,7 +79,7 @@ void subscribeToFeed(String feedName) {
 
 void checkTopic(String topic) {
   //Check if anyone is subscribed to this channel
-  File file = SPIFFS.open("/json/connections.json", FILE_READ);
+  File file = SPIFFS.open("connections.json", FILE_READ);
   // Deserialize the JSON document
   DeserializationError error = deserializeJson(doc, file);
   if (error)
