@@ -6,7 +6,7 @@
 
 #include <AceButton.h>
 using namespace ace_button;
-#define LONG_PRESS 2000
+#define LONG_PRESS 4000
 
 #include <Preferences.h>
 Preferences prefs;

@@ -49,13 +49,13 @@ void performAction() {
     delay(15);             // waits 15ms for the servo to reach the position
   }
 #elif defined(CAM_PHOTO_DEVICE)
-
+  takePhoto();
 #elif defined(SERVO_CONTINUOUS_DEVICE)
   myservo.write(180);
   delay(1000);
   myservo.write(90);
 #elif defined(ON_PIN_DEVICE)
-Serial.println("ON");
+  Serial.println("ON");
   digitalWrite(USER_PIN, 1);
   delay(3000);
   digitalWrite(USER_PIN, 0);
