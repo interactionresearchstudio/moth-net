@@ -1,3 +1,8 @@
+//#define CAP_TOUCH_DEVICE
+#define SIMPLE_SWITCH_DEVICE
+//#define CAM_MOVEMENT_DEVICE
+//#define RADAR_DEVICE
+
 #include <Arduino.h>
 #include <SPIFFS.h>
 #include <WiFi.h>
@@ -55,7 +60,6 @@ struct_message msg;
 struct_message outgoingReadings;
 esp_now_peer_info_t peerInfo;
 
-#define CAP_TOUCH_DEVICE
 
 #if defined(CAP_TOUCH_DEVICE)
 #define DEVICE_TYPE cap_touch
@@ -63,8 +67,6 @@ esp_now_peer_info_t peerInfo;
 #define DEVICE_TYPE simple_switch
 #elif defined(CAM_MOVEMENT_DEVICE)
 #define DEVICE_TYPE cam_movement
-#elif defined(RADAR_DEVICE)
-#define DEVICE_TYPE radar
 #elif defined(RADAR_DEVICE)
 #define DEVICE_TYPE radar
 #endif
@@ -158,5 +160,5 @@ void loop() {
 #elif defined(RADAR_DEVICE)
   checkRadar();
 #endif
-  checkChannel();
+  //checkChannel();
 }

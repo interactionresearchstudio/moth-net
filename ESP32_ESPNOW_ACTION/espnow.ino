@@ -139,9 +139,14 @@ void onDataReceive(const uint8_t * mac_addr, const uint8_t *incomingData, int le
     } else if (msg.function == blinking) {
       Serial.println("Blink!");
       blinkLed();
-    }  else if (array_cmp(msg.mac, baseMac, 6, 6)) {
-      if (msg.function == action) {
+    }
+    if (msg.function == action) {
+      Serial.println("it's an action");
+      if (array_cmp(msg.mac, baseMac, 6, 6)) {
+        Serial.println("sent to my mac address");
         performAction();
+      } else {
+        Serial.println("for another sensor");
       }
     }
   }

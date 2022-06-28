@@ -132,6 +132,8 @@ void print_frame(uint16_t frame[H][W]) {
   }
 }
 
+int detects = 0;
+
 void checkCam() {
   if (!capture_still()) {
     Serial.println("Failed capture");
@@ -141,8 +143,12 @@ void checkCam() {
   }
 
   if (motion_detect()) {
-    Serial.println("Motion detected");
-    sendSensor();
+    detects++;
+    if (detects == 2) {
+      Serial.println("Motion detected");
+      detects = 0;
+      sendSensor();
+    }
   }
 
   update_frame();

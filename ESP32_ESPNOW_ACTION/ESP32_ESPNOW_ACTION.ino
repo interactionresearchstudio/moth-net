@@ -1,6 +1,6 @@
-#define CAM_PHOTO_DEVICE
+//#define CAM_PHOTO_DEVICE
 //#define SERVO_DEVICE
-//#define SERVO_CONTINUOUS_DEVICE
+#define SERVO_CONTINUOUS_DEVICE
 //#define ON_PIN_DEVICE
 
 #include <Arduino.h>
@@ -22,7 +22,7 @@ int setWifi = 0;
 uint8_t baseMac[6];
 
 #if defined(CAM_PHOTO_DEVICE)
-#define LED_PIN 4
+#define LED_PIN -1
 #define USER_PIN -1
 int BTN_PIN =   -1;
 #else
@@ -128,20 +128,20 @@ File file;
 
 
 void setup() {
-  pinMode(LED_PIN,         OUTPUT);
-
 #ifndef CAM_PHOTO_DEVICE
+  pinMode(LED_PIN,         OUTPUT);
   pinMode(BTN_PIN,      INPUT);
   ButtonConfig* buttonConfigBuiltIn = buttonBuiltIn.getButtonConfig();
   buttonConfigBuiltIn->setEventHandler(handleButtonEvent);
   buttonConfigBuiltIn->setFeature(ButtonConfig::kFeatureClick);
   buttonConfigBuiltIn->setFeature(ButtonConfig::kFeatureLongPress);
   buttonConfigBuiltIn->setLongPressDelay(LONG_PRESS);
-  Serial.begin(115200); delay(500);
   randomSeed(analogRead(0));
 #else
-  randomSeed(analogRead(4));
+  // randomSeed(analogRead(4));
 #endif
+
+  Serial.begin(115200); delay(500);
 
 #if defined(SERVO_DEVICE)
   ESP32PWM::allocateTimer(0);
@@ -149,7 +149,7 @@ void setup() {
   ESP32PWM::allocateTimer(2);
   ESP32PWM::allocateTimer(3);
   myservo.setPeriodHertz(50);    // standard 50 hz servo
-  myservo.attach(USER_PIN, 1000, 2000);
+  myservo.attach(USER_PIN, 150, 2500);
 #elif defined(SERVO_CONTINUOUS_DEVICE)
   ESP32PWM::allocateTimer(0);
   ESP32PWM::allocateTimer(1);

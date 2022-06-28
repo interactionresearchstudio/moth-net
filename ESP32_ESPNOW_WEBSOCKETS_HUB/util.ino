@@ -295,6 +295,9 @@ void getMacArray(int index) {
   if (error)
     Serial.println(F("Failed to read file, using default configuration"));
   String macIn = doc[index]["mac"].as<String>();
+  for (int i = 0; i < 6; i++) {
+    macToSend[i] = 0;
+  }
   char* ptr; //start and end pointer for strtol
   macToSend[0] = strtol(macIn.c_str(), &ptr, HEX );
   for ( uint8_t i = 1; i < 6; i++ )

@@ -82,21 +82,36 @@ void checkTopic(String topic) {
   File file = SPIFFS.open("/json/connections.json", FILE_READ);
   // Deserialize the JSON document
   DeserializationError error = deserializeJson(doc, file);
+  uint32_t messageToSend = 0;
   if (error)
     Serial.println(F("Failed to read file, using default configuration"));
   file.close();
   Serial.println(topic);
-  int macObject = doc.size();
+  int macObject = 0;
+  Serial.print(doc.size());
+  Serial.println(" to check");
+  String adafruitIo = getAIOUser() + "/feeds/";
+  String docString = "";
   for (int i = 0; i < doc.size(); i++) {
-    String docString =  getAIOUser() + "/feeds/";
-    docString = docString + doc[i]["feed"].as<String>();
+    docString = adafruitIo + doc[i]["feed"].as<String>();
+    Serial.println(docString);
+    Serial.println(topic);
     if ((docString == topic) && (doc[i]["sensorType"].as<int>() == (int)cam_photo || doc[i]["sensorType"].as<int>() == (int)servo || doc[i]["sensorType"].as<int>() == (int)servo_continuous || doc[i]["sensorType"].as<int>() == (int)on_pin)) {
       Serial.println("Matched connection");
       macObject = i;
-      sendSensorTo(macObject, doc[i]["sensorType"].as<int>(), 0);
-      blinkLed(100);
+      // sendSensorTo(macObject, doc[i]["sensorType"].as<int>(), 0);
+      bitWrite(messageToSend, i, 1);
+      blinkLed(1);
     } else {
       //Serial.println("no matching connections");
+    }
+  }
+  if (messageToSend > 0) {
+    for (uint32_t i = 0; i < 32; i ++) {
+      if (bitRead(messageToSend, i) == 1) {
+        sendSensorTo(i, doc[i]["sensorType"].as<int>(), 0);
+        Serial.println("sending action message");
+      }
     }
   }
   doc.clear();
