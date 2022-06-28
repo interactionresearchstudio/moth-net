@@ -72,3 +72,16 @@ void checkCap() {
     isPressed = false;
   }
 }
+
+void checkHall() {
+  int hall = hallRead();
+  if (hall > 48 && isPressed == false) {
+    isPressed = true;
+    sendSensor();
+    delay(50);
+  }
+  if (hall > 50 && isPressed == true) {
+    isPressed = false;
+  }
+  delay(5);
+}

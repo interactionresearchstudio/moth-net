@@ -1,7 +1,8 @@
 //#define CAP_TOUCH_DEVICE
-#define SIMPLE_SWITCH_DEVICE
+//#define SIMPLE_SWITCH_DEVICE
 //#define CAM_MOVEMENT_DEVICE
 //#define RADAR_DEVICE
+#define HALLEFFECT_DEVICE
 
 #include <Arduino.h>
 #include <SPIFFS.h>
@@ -69,6 +70,8 @@ esp_now_peer_info_t peerInfo;
 #define DEVICE_TYPE cam_movement
 #elif defined(RADAR_DEVICE)
 #define DEVICE_TYPE radar
+#elif defined(HALLEFFECT_DEVICE)
+#define DEVICE_TYPE hallEffect
 #endif
 
 
@@ -159,6 +162,8 @@ void loop() {
   checkCap();
 #elif defined(RADAR_DEVICE)
   checkRadar();
+#elif defined(HALLEFFECT_DEVICE)
+  checkHall();
 #endif
   //checkChannel();
 }
