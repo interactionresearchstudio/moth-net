@@ -16,7 +16,7 @@ void handleButtonEvent(AceButton* button, uint8_t eventType, uint8_t buttonState
         case AceButton::kEventReleased:
           if (isLong == false) {
             //do something on long press
-            sendSensor();
+            sendSensor(2);
           } else {
             isLong = false;
           }
@@ -42,7 +42,7 @@ void checkRadar() {
   int pressed = digitalRead(SENSOR_PIN);
   if (pressed == true && isPressed == false) {
     isPressed = true;
-    sendSensor();
+    sendSensor(1);
   }
   if (pressed == false && isPressed == true) {
     isPressed = false;
@@ -54,7 +54,7 @@ void checkSwitch() {
   int pressed = digitalRead(SENSOR_PIN);
   if (pressed == false && isPressed == false) {
     isPressed = true;
-    sendSensor();
+    sendSensor(2);
   }
   if (pressed == true && isPressed == true) {
     isPressed = false;
@@ -66,7 +66,7 @@ void checkCap() {
   int touch = touchRead(T0);
   if (touch < 50 && isPressed == false) {
     isPressed = true;
-    sendSensor();
+    sendSensor(1);
   }
   if (touch > 50 && isPressed == true) {
     isPressed = false;
@@ -75,12 +75,12 @@ void checkCap() {
 
 void checkHall() {
   int hall = hallRead();
-  if (hall > 48 && isPressed == false) {
+  if (hall > 19 && isPressed == false) {
     isPressed = true;
-    sendSensor();
+    sendSensor(1);
     delay(50);
   }
-  if (hall > 50 && isPressed == true) {
+  if (hall < 20 && isPressed == true) {
     isPressed = false;
   }
   delay(5);

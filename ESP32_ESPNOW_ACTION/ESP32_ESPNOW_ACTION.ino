@@ -1,6 +1,6 @@
 //#define CAM_PHOTO_DEVICE
-//#define SERVO_DEVICE
-#define SERVO_CONTINUOUS_DEVICE
+#define SERVO_DEVICE
+//#define SERVO_CONTINUOUS_DEVICE
 //#define ON_PIN_DEVICE
 
 #include <Arduino.h>
@@ -149,7 +149,7 @@ void setup() {
   ESP32PWM::allocateTimer(2);
   ESP32PWM::allocateTimer(3);
   myservo.setPeriodHertz(50);    // standard 50 hz servo
-  myservo.attach(USER_PIN, 150, 2500);
+  myservo.attach(USER_PIN, 150, 2000);
 #elif defined(SERVO_CONTINUOUS_DEVICE)
   ESP32PWM::allocateTimer(0);
   ESP32PWM::allocateTimer(1);

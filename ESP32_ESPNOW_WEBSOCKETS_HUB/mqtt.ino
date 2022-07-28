@@ -13,7 +13,7 @@ void mqttCallback(char* topic, byte* payload, unsigned int length) {
       sendBlink();
     }
   } else {
-    checkTopic(topicIn);
+    checkTopic(topicIn, (char)payload[0]);
   }
   Serial.println();
 }
@@ -77,7 +77,7 @@ void subscribeToFeed(String feedName) {
   Serial.println(" channel subscribed!");
 }
 
-void checkTopic(String topic) {
+void checkTopic(String topic, char valueOut) {
   //Check if anyone is subscribed to this channel
   File file = SPIFFS.open("/json/connections.json", FILE_READ);
   // Deserialize the JSON document
@@ -109,7 +109,8 @@ void checkTopic(String topic) {
   if (messageToSend > 0) {
     for (uint32_t i = 0; i < 32; i ++) {
       if (bitRead(messageToSend, i) == 1) {
-        sendSensorTo(i, doc[i]["sensorType"].as<int>(), 0);
+
+        sendSensorTo(i, doc[i]["sensorType"].as<int>(), (int)valueOut);
         Serial.println("sending action message");
       }
     }

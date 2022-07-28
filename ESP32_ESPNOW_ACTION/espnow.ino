@@ -144,7 +144,7 @@ void onDataReceive(const uint8_t * mac_addr, const uint8_t *incomingData, int le
       Serial.println("it's an action");
       if (array_cmp(msg.mac, baseMac, 6, 6)) {
         Serial.println("sent to my mac address");
-        performAction();
+        performAction(msg.eventVal);
       } else {
         Serial.println("for another sensor");
       }

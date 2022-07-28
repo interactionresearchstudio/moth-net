@@ -159,11 +159,11 @@ void setWifiChannel(int wifi) {
 }
 
 
-void sendSensor() {
+void sendSensor(int valueIn) {
   // Send message via ESP-NOW
   outgoingReadings.function = sensor;
   outgoingReadings.sensors = DEVICE_TYPE;
-  outgoingReadings.eventVal = 1;
+  outgoingReadings.eventVal = valueIn;
   esp_err_t result = esp_now_send(broadcastAddress, (uint8_t *) &outgoingReadings, sizeof(outgoingReadings));
 
   if (result == ESP_OK) {

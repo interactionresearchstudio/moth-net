@@ -155,6 +155,7 @@ void sendSensorTo(int index, int type, int val) {
   memcpy(outgoingMsg.mac , macToSend, sizeof(macToSend[0]) * 6);
   outgoingMsg.function = action;
   outgoingMsg.sensors = (sensorTypes)type;
+  outgoingMsg.eventVal = val;
   esp_err_t result = esp_now_send(broadcastAddress, (uint8_t *) &outgoingMsg, sizeof(outgoingMsg));
   if (result == ESP_OK) {
     Serial.println("Sent with success");

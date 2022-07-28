@@ -1,8 +1,8 @@
-//#define CAP_TOUCH_DEVICE
+#define CAP_TOUCH_DEVICE
 //#define SIMPLE_SWITCH_DEVICE
 //#define CAM_MOVEMENT_DEVICE
 //#define RADAR_DEVICE
-#define HALLEFFECT_DEVICE
+//#define HALLEFFECT_DEVICE
 
 #include <Arduino.h>
 #include <SPIFFS.h>
