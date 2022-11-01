@@ -84,8 +84,8 @@ bool connectedStatusSend = false;
 bool nameSend = false;
 
 // JSON Docs
-StaticJsonDocument<8000> feeds;
-DynamicJsonDocument feedsSimple(2000);
+//StaticJsonDocument<8000> feeds;
+//DynamicJsonDocument feedsSimple(2000);
 DynamicJsonDocument macs(1000);
 StaticJsonDocument<1000> doc;
 DynamicJsonDocument connectedMacs(1000);

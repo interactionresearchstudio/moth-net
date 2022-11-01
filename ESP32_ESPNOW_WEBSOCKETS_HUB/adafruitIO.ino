@@ -53,6 +53,7 @@ void createFeed(String feedname) {
 
 }
 String getFeeds() {
+  /*
   HTTPClient http;
   String payload = "";
 
@@ -96,9 +97,11 @@ String getFeeds() {
   feedsSimple.clear();
   payload = "";
   return sensor;
+  */
 }
 
 bool insertFeed(String feedName) {
+  /*
   //needs to be lowercase as adafruit IO doesn't look for case.
   feedName.toLowerCase();
   feedName.trim();
@@ -140,6 +143,7 @@ bool insertFeed(String feedName) {
   serializeJson(feedsSimple, sensor);
   //Serial.println(sensor);
   return sensor;
+  */
 }
 
 String getFeedByMac(String mac) {

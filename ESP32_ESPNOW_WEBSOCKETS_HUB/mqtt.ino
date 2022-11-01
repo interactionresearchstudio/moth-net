@@ -65,7 +65,7 @@ void connectToMqtt() {
       for (int i = 0; i < doc.size(); i++) {
         subscribeToFeed(doc[i]["feed"].as<String>());
       }
-      feeds.clear();
+      doc.clear();
       for (int i = 0; i < 3; i++) {
         digitalWrite(LED_PIN, HIGH);
         delay(50);
