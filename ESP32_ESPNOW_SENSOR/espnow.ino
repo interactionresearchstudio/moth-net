@@ -168,6 +168,8 @@ void sendSensor(int valueIn) {
 
   if (result == ESP_OK) {
     Serial.println("Sent with success");
+    blinkLed();
+    delay(500);
   }
   else {
     Serial.println("Error sending the data");

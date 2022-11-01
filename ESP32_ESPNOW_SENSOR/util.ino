@@ -71,6 +71,7 @@ void checkCap() {
   if (touch > 50 && isPressed == true) {
     isPressed = false;
   }
+  
 }
 
 void checkHall() {
