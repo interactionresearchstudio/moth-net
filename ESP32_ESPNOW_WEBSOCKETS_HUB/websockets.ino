@@ -73,9 +73,11 @@ void handleWebSocketMessage(void *arg, uint8_t *data, size_t len) {
         connectedStatusSend = true;
       } else if (in.indexOf("{\"") >= 0 && in.indexOf("mac") >= 0 ) {
         Serial.println("it's the device list");
-        in = in.substring(0, in.indexOf("}]")+2);
+        in = in.substring(0, in.indexOf("}]") + 2);
         Serial.println(in);
         updateJson(in.c_str());
+        delay(50);
+        ESP.restart();
       } else if (in.indexOf("networks") >= 0) {
         // send network scan
         blinkLed(50);
@@ -141,7 +143,7 @@ void sendWiFiScan() {
 void sendSensorScan() {
   //setAllToUnconnected();
   updateWithConnectedMacs();
-  
+
   String scan = loadJSON();
   char buf[2000];
   scan.toCharArray(buf, scan.length() + 1);

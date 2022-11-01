@@ -14,9 +14,9 @@ void setupPins() {
 }
 
 void blinkLed(int delayTime) {
-  digitalWrite(LED_PIN, 1);
-  delay(delayTime);
   digitalWrite(LED_PIN, 0);
+  delay(delayTime);
+  digitalWrite(LED_PIN, 1);
 }
 
 // button functions
@@ -25,7 +25,9 @@ void handleButtonEvent(AceButton* button, uint8_t eventType, uint8_t buttonState
     case 0:
       switch (eventType) {
         case AceButton::kEventPressed:
-          getFeeds();
+          //getFeeds();
+          blinkLed(50);
+          sendBlink();
           break;
         case AceButton::kEventReleased:
           break;

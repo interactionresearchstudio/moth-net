@@ -126,10 +126,20 @@ void setup() {
   initWebServer();
 
 }
+bool ledState = false;
 
 void loop() {
   if (isConnectedToInternet()) {
+    if (ledState == false) {
+      ledState = true;
+      digitalWrite(LED_PIN, HIGH);
+    }
     client.loop();
+  } else {
+    if (ledState == true) {
+      ledState = false;
+      digitalWrite(LED_PIN, LOW);
+    }
   }
   ws.cleanupClients();
   buttonBuiltIn.check();
