@@ -49,6 +49,11 @@ void connectToRouter(String SSID, String PASS, unsigned long timeOut) {
 }
 
 bool isConnectedToInternet() {
+ if(WiFi.status() == WL_CONNECTED){
+  isConnected = true;
+ } else {
+  isConnected = false;
+ }
   return isConnected;
 }
 
