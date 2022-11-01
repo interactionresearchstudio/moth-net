@@ -149,14 +149,14 @@ void setup() {
   ESP32PWM::allocateTimer(2);
   ESP32PWM::allocateTimer(3);
   myservo.setPeriodHertz(50);    // standard 50 hz servo
-  myservo.attach(USER_PIN, 150, 2000);
+  myservo.attach(USER_PIN, 500, 2400);
 #elif defined(SERVO_CONTINUOUS_DEVICE)
   ESP32PWM::allocateTimer(0);
   ESP32PWM::allocateTimer(1);
   ESP32PWM::allocateTimer(2);
   ESP32PWM::allocateTimer(3);
   myservo.setPeriodHertz(50);    // standard 50 hz servo
-  myservo.attach(USER_PIN, 1000, 2000);
+  myservo.attach(USER_PIN, 500, 2400);
 #elif defined(ON_PIN_DEVICE)
   pinMode(USER_PIN, OUTPUT);
   Serial.println("on pin!");
