@@ -322,6 +322,34 @@ void getMacArray(int index) {
   doc.clear();
 }
 
+int getNumFeeds() {
+  // Open file for reading
+  File file = SPIFFS.open("/json/connections.json", FILE_READ);
+  // Deserialize the JSON document
+  DeserializationError error = deserializeJson(doc, file);
+  if (error)
+    Serial.println(F("Failed to read file, using default configuration"));
+  int arraySize = doc.size();
+  file.close();
+  return arraySize;
+}
+
+String getSavedFeed(int index) {
+  //populates "macToSend" with the uint8_t array of the mac address
+
+  // Open file for reading
+  File file = SPIFFS.open("/json/connections.json", FILE_READ);
+  // Deserialize the JSON document
+  DeserializationError error = deserializeJson(doc, file);
+  if (error)
+    Serial.println(F("Failed to read file, using default configuration"));
+  String feedOut = doc[index]["feed"].as<String>();
+  doc.clear();
+  file.close();
+  return feedOut;
+}
+
+
 
 //Utility for comparing two arrays
 boolean array_cmp(uint8_t *a, uint8_t *b, int len_a, int len_b) {

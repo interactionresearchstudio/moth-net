@@ -36,20 +36,34 @@ void connectToMqtt() {
       feedName = "moth-net.newsensor";
       subscribeToFeed(feedName);
       feedName = "";
+      Serial.println("number of feeds");
+      //get amount of feeds
+      //subscribe
+      // Open file for reading
+      File file = SPIFFS.open("/json/connections.json", FILE_READ);
+      // Deserialize the JSON document
+      DeserializationError error = deserializeJson(doc, file);
+      if (error)
+        Serial.println(F("Failed to read file, using default configuration"));
+      file.close();
+      //String feedOut = doc[index]["feed"].as<String>();
+      Serial.println("Size of feeds");
+      Serial.println(doc.size());
+      file.close();
       //Subscribe to all feeds
-      String feedIn = getFeeds();
-      feeds.clear();
-      DeserializationError error = deserializeJson(feeds, feedIn);
+      // String feedIn = getFeeds();
+      // feeds.clear();
+      // DeserializationError error = deserializeJson(feeds, feedIn);
       // Test if parsing succeeds.
-      if (error) {
-        Serial.print(F("deserializeJson() failed: "));
-        Serial.println(error.f_str());
-      }
+      // if (error) {
+      //   Serial.print(F("deserializeJson() failed: "));
+      //   Serial.println(error.f_str());
+      //  }
       Serial.print("You have ");
-      Serial.print(feeds.size());
+      Serial.print(doc.size());
       Serial.println(" feeds.");
-      for (int i = 0; i < feeds.size(); i++) {
-        subscribeToFeed(feeds[i]["name"]);
+      for (int i = 0; i < doc.size(); i++) {
+        subscribeToFeed(doc[i]["feed"].as<String>());
       }
       feeds.clear();
       for (int i = 0; i < 3; i++) {
