@@ -21,7 +21,11 @@ void onDataReceive(const uint8_t * mac_addr, const uint8_t *incomingData, int le
     Serial.println(msg.function);
     if (msg.function == heartbeat) {
       Serial.println("HeartBeat!");
-      saveJSON(macStr, msg.sensors);
+      if (inDynamicJson(macStr) == false) {
+        saveJSON(macStr, msg.sensors);
+      } else {
+        Serial.println("no need to save json");
+      }
       numConnectedDevices++;
       addConnectedMac(macStr);
       // setDeviceToConnected(macStr);
@@ -269,7 +273,8 @@ void clearConnectedMacs() {
   macsOnline.clear();
 }
 
-void updateWithConnectedMacs() {
+/*
+  void updateWithConnectedMacs() {
   File file = SPIFFS.open("/json/connections.json", FILE_READ);
   // Deserialize the JSON document
   DeserializationError error = deserializeJson(doc, file);
@@ -308,4 +313,26 @@ void updateWithConnectedMacs() {
   file2.close();
   doc.clear();
   Serial.println("updated connections!");
+
+  }
+*/
+void updateWithConnectedMacs() {
+  // Open file for writing
+  int macObject = dynamicDoc.size();
+  for (int i = 0; i < dynamicDoc.size(); i++) {
+    dynamicDoc[i]["connected"] = false;
+  }
+
+  for (int i = 0; i < dynamicDoc.size(); i++) {
+    for (int j = 0; j < macsOnline.size(); j++) {
+      Serial.print("dynamic mac: ");
+      Serial.println(macsOnline[j].as<String>());
+      if (dynamicDoc[i]["mac"].as<String>() == macsOnline[j].as<String>()) {
+        Serial.println("matched a mac that is online");
+        dynamicDoc[i]["connected"] = true;
+      }
+    }
+  }
+
+
 }

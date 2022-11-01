@@ -5,11 +5,11 @@
 
 
 void notifyClients() {
- // String out = getFeeds();
- // char buf[1000];
- // out.toCharArray(buf, out.length() + 1);
- // ws.textAll(buf, out.length());
- // Serial.println(out);
+  // String out = getFeeds();
+  // char buf[1000];
+  // out.toCharArray(buf, out.length() + 1);
+  // ws.textAll(buf, out.length());
+  // Serial.println(out);
 }
 
 /*UI Sends
@@ -144,7 +144,8 @@ void sendSensorScan() {
   //setAllToUnconnected();
   updateWithConnectedMacs();
 
-  String scan = loadJSON();
+  // String scan = loadJSON();
+  String scan = dynamicDoc.as<String>();
   char buf[2000];
   scan.toCharArray(buf, scan.length() + 1);
   ws.textAll(buf, scan.length());
@@ -170,11 +171,11 @@ void sendConnectedStatus() {
 
 
 void sendFeedsScan() {
- // char buf[2000];
- // String scan = getFeeds();
- // scan.toCharArray(buf, scan.length() + 1);
- // ws.textAll(buf, scan.length());
- // Serial.println(scan);
+  // char buf[2000];
+  // String scan = getFeeds();
+  // scan.toCharArray(buf, scan.length() + 1);
+  // ws.textAll(buf, scan.length());
+  // Serial.println(scan);
   //delete buf;
 }
 

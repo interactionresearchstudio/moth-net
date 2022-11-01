@@ -46,18 +46,24 @@ String loadJSON() {
   // Open file for reading
   File file = SPIFFS.open("/json/connections.json", FILE_READ);
   DeserializationError error = deserializeJson(doc, file);
+  dynamicDoc = doc;
   if (error) {
     Serial.println(F("Failed to read JSON file, using default configuration"));
   } else {
     //Serial.println(doc.as<String>());
     Serial.println(doc.size());
     out = doc.as<String>();
+    Serial.println("dynamic doc");
+    Serial.println(dynamicDoc.as<String>());
+
   }
   file.close();
   if (out == "") {
+    dynamicDoc.clear();
     doc.clear();
     File file2 = SPIFFS.open("/json/connections_backup.json", FILE_READ);
     DeserializationError error = deserializeJson(doc, file2);
+    dynamicDoc = doc;
     if (error) {
       Serial.println(F("Failed to read backup JSON file, using default configuration"));
     } else {
@@ -121,6 +127,22 @@ void updateJson(const char* jsonIn) {
   file.close();
 }
 
+bool inDynamicJson(char* macStr) {
+  bool inDynamicArray = false;
+  int arraySize = dynamicDoc.size();
+  Serial.print("Dynamic size: ");
+  Serial.println(arraySize);
+  for (int i = 0; i < dynamicDoc.size(); i++) {
+    Serial.println(dynamicDoc[i]["mac"].as<String>());
+    if (dynamicDoc[i]["mac"] == macStr) {
+      inDynamicArray = true;
+      Serial.println("mac in dynamic array");
+      break;
+    }
+  }
+  return inDynamicArray;
+}
+
 void saveJSON(char* macStr, sensorTypes sensor) {
   bool updateJson = false;
   File file = SPIFFS.open("/json/connections.json", FILE_READ);
@@ -166,7 +188,7 @@ void saveJSON(char* macStr, sensorTypes sensor) {
   }
   if (updateJson) {
     SPIFFS.remove("/json/connections_backup.json");
-    SPIFFS.rename("onnections.json", "/json/connections_backup.json");
+    SPIFFS.rename("/json/connections.json", "/json/connections_backup.json");
     Serial.println("copied over to backup");
     SPIFFS.remove("/json/connections.json");
     File file2 = SPIFFS.open("/json/connections.json", FILE_WRITE);
@@ -178,6 +200,8 @@ void saveJSON(char* macStr, sensorTypes sensor) {
     // Serialize JSON to file
     if (serializeJson(doc, file2) == 0) {
       Serial.println(F("Failed to write to file"));
+    } else {
+      dynamicDoc = doc;
     }
     // Close the file
     file2.close();

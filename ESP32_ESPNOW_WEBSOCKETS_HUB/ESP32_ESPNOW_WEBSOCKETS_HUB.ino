@@ -88,6 +88,7 @@ bool nameSend = false;
 //DynamicJsonDocument feedsSimple(2000);
 DynamicJsonDocument macs(1000);
 StaticJsonDocument<1000> doc;
+StaticJsonDocument<1000> dynamicDoc;
 DynamicJsonDocument connectedMacs(1000);
 JsonArray macsOnline;
 
