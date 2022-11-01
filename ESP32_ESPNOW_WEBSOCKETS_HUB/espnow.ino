@@ -267,9 +267,10 @@ void addConnectedMac(String macIn) {
 }
 
 void clearConnectedMacs() {
-  for (int i = 0; i < macsOnline.size(); i++) {
-    Serial.println(macsOnline[i].as<String>());
-  }
+ // for (int i = 0; i < macsOnline.size(); i++) {
+ //   Serial.println(macsOnline[i].as<String>());
+ // }
+ Serial.println("cleared macs online before heartbeat");
   macsOnline.clear();
 }
 
