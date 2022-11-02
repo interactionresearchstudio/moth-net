@@ -10,6 +10,7 @@ Here's a list of the sensors currently supported:
 - Capacitive sensor
 - Movement detection with ESP-Cam
 - "On pin high" triggers (PIR sensors, Human Sensor, Peak Sound detectors etc)
+- Internal Hall Effect Sensor
 
 ## Types of Actions currently supported
 Here's a list of the actions currently supported:
