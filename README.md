@@ -32,6 +32,9 @@ Make sure to install all libraries required through the Library manager. One ESP
 - [AceButton](https://github.com/bxparks/AceButton)
 - [PubSubClient](https://github.com/knolleary/pubsubclient)
 
+You will also need the Arduino Filesystem uploader installed for the Hub webpage. 
+- [Arduino ESP32 Filesystem Uploader](https://github.com/me-no-dev/arduino-esp32fs-plugin)
+
 Many thanks you to all the developers and contributors for making and maintaining these libraries.
 
 ## Board settings for Arduino
