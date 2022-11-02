@@ -33,7 +33,7 @@ void connectToMqtt() {
       feedName = getAIOUser() + String("/feeds/moth-hub-led");
       client.subscribe(feedName.c_str());
       //Default feed
-      feedName = "moth-net.newsensor";
+      feedName = "test";
       subscribeToFeed(feedName);
       feedName = "";
       Serial.println("number of feeds");

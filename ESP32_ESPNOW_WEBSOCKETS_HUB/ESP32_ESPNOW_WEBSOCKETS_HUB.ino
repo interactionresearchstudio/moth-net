@@ -115,7 +115,6 @@ void setup() {
   Serial.println(loadJSON());
   initConnectedMacJson();
   //setNetwork(); //Only use when no UI to input credentials
-
   //We need to do wifi/espnow/wifi initialisation to get the wifi channel to be able to set sensors to the correct WiFi channel.
   initWiFi();
   initESPNOW();

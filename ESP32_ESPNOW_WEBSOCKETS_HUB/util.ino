@@ -167,7 +167,7 @@ void saveJSON(char* macStr, sensorTypes sensor) {
     Serial.println("no matches in json file found");
     obj["name"] = getNamefromSensor(sensor);
     obj["mac"] = macStr;
-    obj["feed"] = "moth-net.newsensor";
+    obj["feed"] = "test";
     obj["sensorType"] = (int)sensor;
     obj["value"] = "99";
     obj["connected"] = true;
@@ -180,7 +180,7 @@ void saveJSON(char* macStr, sensorTypes sensor) {
       Serial.println("updating json");
       doc[macObject]["name"] = getNamefromSensor(sensor);
       doc[macObject]["mac"] = macStr;
-      doc[macObject]["feed"] = "moth-net.newsensor";
+      doc[macObject]["feed"] = "test";
       doc[macObject]["sensorType"] = (int)sensor;
       doc[macObject]["value"] = "99";
       doc[macObject]["connected"] = true;
