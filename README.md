@@ -42,7 +42,8 @@ Many thanks you to all the developers and contributors for making and maintainin
 
 ## Board settings for Arduino
 
-For all types of board (Action, Sensor or Hub) use ESP32-Dev-Module. For boards using ESP-CAM, use AI-Thinker CAM
+For all types of board (Action, Sensor or Hub) use ESP32-Dev-Module. For boards using ESP-CAM, use AI-Thinker CAM.<br/>
+
 <img src="https://github.com/interactionresearchstudio/moth-net/blob/main/Hub:Action:Sensor-settings.png" data-canonical-src="https://github.com/interactionresearchstudio/moth-net/blob/main/Hub:Action:Sensor-settings.png" width="400" />
 <img src="https://github.com/interactionresearchstudio/moth-net/blob/main/CAM-board-settings.png " data-canonical-src="https://github.com/interactionresearchstudio/moth-net/blob/main/CAM-board-settings.png " width="400" />
 
