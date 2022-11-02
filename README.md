@@ -25,6 +25,13 @@ Make sure to install all libraries required through the Library manager. One ESP
 
 ![diagram](https://github.com/interactionresearchstudio/moth-net/blob/main/Moth-net%20diagram.jpeg)
 
+## Board settings for Arduino
+
+For all types of board (Action, Sensor or Hub) use ESP32-Dev-Module. For boards using ESP-CAM, use AI-Thinker CAM
+<img src="https://github.com/interactionresearchstudio/moth-net/blob/main/Hub:Action:Sensor-settings.png" data-canonical-src="https://github.com/interactionresearchstudio/moth-net/blob/main/Hub:Action:Sensor-settings.png" width="400" />
+<img src="https://github.com/interactionresearchstudio/moth-net/blob/main/CAM-board-settings.png " data-canonical-src="https://github.com/interactionresearchstudio/moth-net/blob/main/CAM-board-settings.png " width="400" />
+
+
 ## How to get started 
 
 - Create an Account at https://io.adafruit.com/
