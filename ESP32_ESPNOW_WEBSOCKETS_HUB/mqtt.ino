@@ -25,7 +25,7 @@ void connectToMqtt() {
   client.setServer("io.adafruit.com", 1883);
   client.setCallback(mqttCallback);
   if (getAIOUser() != "" && getAIOKey() != "") {
-    if (client.connect("moth-net-cli", getAIOUser().c_str(), getAIOKey().c_str())) {
+    if (client.connect(generateID().c_str(), getAIOUser().c_str(), getAIOKey().c_str())) {
       Serial.println("Connected to MQTT server");
       digitalWrite(LED_PIN, HIGH);
       isConnectedAIO = true;
