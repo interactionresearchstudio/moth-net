@@ -25,6 +25,15 @@ Make sure to install all libraries required through the Library manager. One ESP
 
 ![diagram](https://github.com/interactionresearchstudio/moth-net/blob/main/Moth-net%20diagram.jpeg)
 
+## Additional Libraries
+- [Arduino Json](https://github.com/bblanchon/ArduinoJson)
+- [ESPAsyncWebServer](https://github.com/me-no-dev/ESPAsyncWebServer)
+- [ESP32Servo](https://github.com/jkb-git/ESP32Servo)
+- [AceButton](https://github.com/bxparks/AceButton)
+- [PubSubClient](https://github.com/knolleary/pubsubclient)
+
+Many thanks you to all the developers and contributors for making and maintaining these libraries.
+
 ## Board settings for Arduino
 
 For all types of board (Action, Sensor or Hub) use ESP32-Dev-Module. For boards using ESP-CAM, use AI-Thinker CAM
