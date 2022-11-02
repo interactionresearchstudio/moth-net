@@ -18,12 +18,15 @@ Here's a list of the actions currently supported:
 - "On pin high" Triggered Devices (MOSFETS/Transistor controlled circuits, MP3 Triggers etc) 
 - Custom Raspberry PI GPIO circuit
 
+## Networking Overview
+
+![diagram](https://github.com/interactionresearchstudio/moth-net/blob/main/Moth-net%20diagram.jpeg)
+
 ## Installation
 Make sure to install all libraries required through the Library manager. One ESP-32 board must be present, acting as the hub in order for messages to be forwarded to Adafruit IO. Currently, all ESP-32 sensors must be configured to run on the same WiFi channel as the hub (which in turn uses the internet router's channel).
 
-## Networking Diagram
-
-![diagram](https://github.com/interactionresearchstudio/moth-net/blob/main/Moth-net%20diagram.jpeg)
+## Drivers
+We use the ESP32S board for all devices (except ones using ESP-CAM). These require a driver to be installer to communicate correctly with your computer. Steps for this listed here for [Mac](https://make.yoyomachines.io/Guide/Hardware+Build+Guide+(Mac+Software)/17?lang=en#s27) and [Windows](https://make.yoyomachines.io/Guide/Hardware+Build+Guide+(Windows+software)/9?lang=en#s83)
 
 ## Additional Libraries
 - [Arduino Json](https://github.com/bblanchon/ArduinoJson)
@@ -64,6 +67,8 @@ For all types of board (Action, Sensor or Hub) use ESP32-Dev-Module. For boards 
 - To test your connection from Adafruit IO to hub by creating a button on a Adafruit IO dashboard connected to a feed called moth-hub-led. Make sure the button sends value 1 on press, and 0 on release
 
 ![GIF](https://media0.giphy.com/media/EEayYfkQa362ftdd3D/giphy.gif)
+
+- To test an Action or Sensor is connected to the Hub correctly, Actions and Sensors (using ESP32s Boards) will respond with a blink on the onboard blue led when the BOOT button is pressed on the master. If a device does not respond, it may be out of range, or not on the correct Wi-Fi channel. This can be solved by resetting the Hub device, triggering the Hub to send out a message on all channels with the Hubs correct Wi-Fi Channel
 
 ## To Do
  - Visual connection interface on captive portal
