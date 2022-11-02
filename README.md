@@ -9,12 +9,12 @@ Here's a list of the sensors currently supported:
 - Simple switch
 - Capacitive sensor
 - Movement detection with ESP-Cam
-- "On pin High" triggers (PIR sensors, Human Sensor, Peak Sound detectors etc)
+- "On pin high" triggers (PIR sensors, Human Sensor, Peak Sound detectors etc)
 
 ## Types of Actions currently supported
 Here's a list of the actions currently supported:
 - Photo capture with ESP-Cam
-- Pin High Triggered Devices (MOSFETS/Transistor controlled circuits, MP3 Triggers etc) 
+- "On pin high" Triggered Devices (MOSFETS/Transistor controlled circuits, MP3 Triggers etc) 
 - Custom Raspberry PI GPIO circuit
 
 ## Installation
