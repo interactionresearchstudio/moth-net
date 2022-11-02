@@ -9,10 +9,13 @@ Here's a list of the sensors currently supported:
 - Simple switch
 - Capacitive sensor
 - Movement detection with ESP-Cam
+- "On pin High" triggers (PIR sensors, Human Sensor, Peak Sound detectors etc)
 
 ## Types of Actions currently supported
 Here's a list of the actions currently supported:
 - Photo capture with ESP-Cam
+- Pin High Triggered Devices (MOSFETS/Transistor controlled circuits, MP3 Triggers etc) 
+- Custom Raspberry PI GPIO circuit
 
 ## Installation
 Make sure to install all libraries required through the Library manager. One ESP-32 board must be present, acting as the hub in order for messages to be forwarded to Adafruit IO. Currently, all ESP-32 sensors must be configured to run on the same WiFi channel as the hub (which in turn uses the internet router's channel).
@@ -34,7 +37,6 @@ Make sure to install all libraries required through the Library manager. One ESP
 - Press save to store your credentials.
 - Program a new ESP32 with the appropriate Firmware from the repository. This will now be your sensor.
 - Follow the wiring diagram for each sensor to connect the correct peripherals for your sensor.
-- **BUG:** Ensure your Home Wi-Fi network channel is the same as listed in the firmware of the Sensors and Device Hub.
 - Power up your devices and place then in the field. We recommend the Device hub be powered close to your Home network Router inside, but within line of sight of the sensors up to 50m. We recommend trial testing sending sensor data from the sensor to the hub and checking if it has been recorded on your Adafruit IO feed before leaving devices to collect data.
 
 ## Tests
