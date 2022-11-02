@@ -1,7 +1,7 @@
 //#define CAM_PHOTO_DEVICE
-#define SERVO_DEVICE
+//#define SERVO_DEVICE
 //#define SERVO_CONTINUOUS_DEVICE
-//#define ON_PIN_DEVICE
+#define ON_PIN_DEVICE
 
 #include <Arduino.h>
 #include <SPIFFS.h>

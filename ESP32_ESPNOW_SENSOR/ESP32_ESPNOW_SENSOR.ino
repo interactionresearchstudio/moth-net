@@ -118,7 +118,7 @@ void print_frame(uint16_t frame[H][W]);
 void setup() {
   Serial.begin(115200); delay(500);
 #ifndef CAM_MOVEMENT_DEVICE
-  Serial.println("not cap touch");
+  Serial.println("cam movement");
   randomSeed(analogRead(0));
   pinMode(BTN_PIN, INPUT);
   buttonBuiltIn.init(BTN_PIN, HIGH);

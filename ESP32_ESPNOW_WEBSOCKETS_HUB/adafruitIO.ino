@@ -1,5 +1,6 @@
 void createData(String feedname) {
-  String serverPath = "http://io.adafruit.com/api/v2/vastltd/groups/moth-net/feeds/";
+  //String serverPath = "http://io.adafruit.com/api/v2/vastltd/groups/moth-net/feeds/";
+  String serverPath = "http://io.adafruit.com/api/v2/IRS/feeds/";
   serverPath = serverPath + feedname;
   serverPath = serverPath + "/data";
   WiFiClient client;
@@ -27,8 +28,8 @@ void createData(String feedname) {
 
 void createFeed(String feedname) {
   feedname.toLowerCase();
-  String serverPath = "http://io.adafruit.com/api/v2/vastltd/groups/moth-net/feeds";
-
+  // String serverPath = "http://io.adafruit.com/api/v2/vastltd/groups/moth-net/feeds";
+  String serverPath = "http://io.adafruit.com/api/v2/IRS/feeds/";
   WiFiClient client;
   HTTPClient httpPost;
 
@@ -54,71 +55,71 @@ void createFeed(String feedname) {
 }
 String getFeeds() {
   /*
-  HTTPClient http;
-  String payload = "";
+    HTTPClient http;
+    String payload = "";
 
-  http.begin("https://io.adafruit.com/api/v2/vastltd/groups/moth-net/feeds"); //Specify the URL and certificate
-  http.addHeader("X-AIO-Key", getAIOKey().c_str());
-  http.setConnectTimeout(10000);
-  int httpCode = http.GET();                                                  //Make the request
+    http.begin("https://io.adafruit.com/api/v2/vastltd/groups/moth-net/feeds"); //Specify the URL and certificate
+    http.addHeader("X-AIO-Key", getAIOKey().c_str());
+    http.setConnectTimeout(10000);
+    int httpCode = http.GET();                                                  //Make the request
 
-  if (httpCode > 0) { //Check for the returning code
+    if (httpCode > 0) { //Check for the returning code
 
     payload = http.getString();
     Serial.println(httpCode);
     //Serial.println(payload);
-  } else {
+    } else {
     Serial.println("Error on HTTP request");
     Serial.println(httpCode);
-  }
+    }
 
-  http.end(); //Free the resources
+    http.end(); //Free the resources
 
-  // Deserialize the JSON document
-  DeserializationError error = deserializeJson(feeds, payload);
+    // Deserialize the JSON document
+    DeserializationError error = deserializeJson(feeds, payload);
 
-  // Test if parsing succeeds.
-  if (error) {
+    // Test if parsing succeeds.
+    if (error) {
     Serial.print(F("deserializeJson() failed: "));
     Serial.println(error.f_str());
-  }
+    }
 
-  Serial.print("You have ");
-  Serial.print(feeds.size());
-  Serial.println(" feeds.");
-  for (byte i = 0; i < feeds.size(); i++) {
+    Serial.print("You have ");
+    Serial.print(feeds.size());
+    Serial.println(" feeds.");
+    for (byte i = 0; i < feeds.size(); i++) {
     Serial.println(feeds[i]["name"].as<String>());
     feedsSimple[i]["name"] = "moth-net."+feeds[i]["name"].as<String>();
-  }
-  String sensor = "";
-  serializeJson(feedsSimple, sensor);
-  //Serial.println(sensor);
-  feeds.clear();
-  feedsSimple.clear();
-  payload = "";
-  return sensor;
+    }
+    String sensor = "";
+    serializeJson(feedsSimple, sensor);
+    //Serial.println(sensor);
+    feeds.clear();
+    feedsSimple.clear();
+    payload = "";
+    return sensor;
   */
 }
 
 bool insertFeed(String feedName) {
   /*
-  //needs to be lowercase as adafruit IO doesn't look for case.
-  feedName.toLowerCase();
-  feedName.trim();
-  String feedIn = getFeeds();
-  feeds.clear();
-  DeserializationError error = deserializeJson(feeds, feedIn);
-  // Test if parsing succeeds.
-  if (error) {
+    //needs to be lowercase as adafruit IO doesn't look for case.
+    feedName.toLowerCase();
+    feedName.trim();
+    String feedIn = getFeeds();
+    feeds.clear();
+    DeserializationError error = deserializeJson(feeds, feedIn);
+    // Test if parsing succeeds.
+    if (error) {
     Serial.print(F("deserializeJson() failed: "));
     Serial.println(error.f_str());
-  }
-  Serial.print("You have ");
-  Serial.print(feeds.size());
-  Serial.println(" feeds.");
-  bool isNewFeed = true;
-  String feedSaved;
-  for (byte i = 0; i < feeds.size(); i++) {
+    }
+    Serial.print("You have ");
+    Serial.print(feeds.size());
+    Serial.println(" feeds.");
+    bool isNewFeed = true;
+    String feedSaved;
+    for (byte i = 0; i < feeds.size(); i++) {
     //Needs to lowercase.
     feedSaved = feeds[i]["name"].as<String>();
     feedSaved.toLowerCase();
@@ -128,21 +129,21 @@ bool insertFeed(String feedName) {
       isNewFeed = false;
       break;
     }
-  }
-  if (isNewFeed == true) {
+    }
+    if (isNewFeed == true) {
     Serial.print("Inserting feed ");
     Serial.print(feedName);
     Serial.println(" into feeds list");
     createFeed(feedName);
     return true;
-  } else {
+    } else {
     Serial.println("We already have that feed");
     return false;
-  }
-  String sensor = "";
-  serializeJson(feedsSimple, sensor);
-  //Serial.println(sensor);
-  return sensor;
+    }
+    String sensor = "";
+    serializeJson(feedsSimple, sensor);
+    //Serial.println(sensor);
+    return sensor;
   */
 }
 

@@ -53,6 +53,12 @@ void addMac(char* incomingMac) {
 void factoryReset() {
   Serial.println("factory reset!");
   deletePrefs();
+  File file = SPIFFS.open("/json/connections.json", FILE_WRITE);
+  SPIFFS.remove("/json/connections.json");
+  SPIFFS.remove("/json/connections_backup.json");
+  dynamicDoc = NULL;
+  ESP.restart();
+
 }
 
 String getNetworkSSID() {
@@ -93,7 +99,7 @@ void getScanAsJson(JsonDocument& jsonDoc) {
 //For DEBUG
 void setNetwork() {
   //preferences.putString("wifiSSID", String(WIFI_SSID));
- // preferences.putString("wifiPASS", String(WIFI_PASS));
+  // preferences.putString("wifiPASS", String(WIFI_PASS));
 }
 
 void setNetwork(String SSID, String PASS) {
