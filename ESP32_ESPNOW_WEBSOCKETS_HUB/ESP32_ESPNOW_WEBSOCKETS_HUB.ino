@@ -82,6 +82,7 @@ bool sensorScanSend = false;
 bool sendFeeds = false;
 bool connectedStatusSend = false;
 bool nameSend = false;
+long lastReconnectAttempt = 0;
 
 // JSON Docs
 //StaticJsonDocument<8000> feeds;
@@ -124,7 +125,7 @@ void setup() {
   }
   initWebSocket();
   initWebServer();
-
+  lastReconnectAttempt = 0;
 }
 bool ledState = false;
 
@@ -134,7 +135,18 @@ void loop() {
       ledState = true;
       digitalWrite(LED_PIN, HIGH);
     }
-    client.loop();
+    if (!client.connected()) {
+      long now = millis();
+      if (now - lastReconnectAttempt > 5000) {
+        lastReconnectAttempt = now;
+        // Attempt to reconnect
+        if (reconnect()) {
+          lastReconnectAttempt = 0;
+        }
+      }
+    } else {
+      client.loop();
+    }
   } else {
     if (ledState == true) {
       ledState = false;

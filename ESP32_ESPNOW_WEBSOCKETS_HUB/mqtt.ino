@@ -137,3 +137,8 @@ void checkTopic(String topic, char valueOut) {
 void disconnectFromMqtt() {
   WiFi.mode(WIFI_STA);
 }
+
+boolean reconnect() {
+  connectToMqtt();
+  return client.connected();
+}
