@@ -1,7 +1,7 @@
 //#define CAM_PHOTO_DEVICE
 //#define SERVO_DEVICE
-//#define SERVO_CONTINUOUS_DEVICE
-#define ON_PIN_DEVICE
+#define SERVO_CONTINUOUS_DEVICE
+//#define ON_PIN_DEVICE
 
 #include <Arduino.h>
 #include <SPIFFS.h>
@@ -150,6 +150,7 @@ void setup() {
   ESP32PWM::allocateTimer(3);
   myservo.setPeriodHertz(50);    // standard 50 hz servo
   myservo.attach(USER_PIN, 500, 2400);
+  Serial.println("servo!!");
 #elif defined(SERVO_CONTINUOUS_DEVICE)
   ESP32PWM::allocateTimer(0);
   ESP32PWM::allocateTimer(1);
@@ -157,11 +158,13 @@ void setup() {
   ESP32PWM::allocateTimer(3);
   myservo.setPeriodHertz(50);    // standard 50 hz servo
   myservo.attach(USER_PIN, 500, 2400);
+  Serial.println("servo continuous!");
 #elif defined(ON_PIN_DEVICE)
   pinMode(USER_PIN, OUTPUT);
   Serial.println("on pin!");
 #elif defined(CAM_PHOTO_DEVICE)
   setupCam();
+  Serial.println("cam!");
 #endif
   initPrefs();
   initWiFi();

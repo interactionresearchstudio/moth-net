@@ -1,8 +1,8 @@
-#define CAP_TOUCH_DEVICE
+//#define CAP_TOUCH_DEVICE
 //#define SIMPLE_SWITCH_DEVICE
 //#define CAM_MOVEMENT_DEVICE
 //#define RADAR_DEVICE
-//#define HALLEFFECT_DEVICE
+#define HALLEFFECT_DEVICE
 
 #include <Arduino.h>
 #include <SPIFFS.h>
@@ -117,8 +117,8 @@ void print_frame(uint16_t frame[H][W]);
 
 void setup() {
   Serial.begin(115200); delay(500);
-#ifndef CAM_MOVEMENT_DEVICE
-  Serial.println("cam movement");
+#if defined(CAP_TOUCH_DEVICE)
+  Serial.println("cap touch device");
   randomSeed(analogRead(0));
   pinMode(BTN_PIN, INPUT);
   buttonBuiltIn.init(BTN_PIN, HIGH);
@@ -127,7 +127,38 @@ void setup() {
   buttonConfigBuiltIn->setFeature(ButtonConfig::kFeatureClick);
   buttonConfigBuiltIn->setFeature(ButtonConfig::kFeatureLongPress);
   buttonConfigBuiltIn->setLongPressDelay(LONG_PRESS);
-#else
+#elif defined(SIMPLE_SWITCH_DEVICE)
+  Serial.println("switch device");
+  randomSeed(analogRead(0));
+  pinMode(BTN_PIN, INPUT);
+  buttonBuiltIn.init(BTN_PIN, HIGH);
+  ButtonConfig* buttonConfigBuiltIn = buttonBuiltIn.getButtonConfig();
+  buttonConfigBuiltIn->setEventHandler(handleButtonEvent);
+  buttonConfigBuiltIn->setFeature(ButtonConfig::kFeatureClick);
+  buttonConfigBuiltIn->setFeature(ButtonConfig::kFeatureLongPress);
+  buttonConfigBuiltIn->setLongPressDelay(LONG_PRESS);
+#elif defined(RADAR_DEVICE)
+  Serial.println("radar device");
+  randomSeed(analogRead(0));
+  pinMode(BTN_PIN, INPUT);
+  buttonBuiltIn.init(BTN_PIN, HIGH);
+  ButtonConfig* buttonConfigBuiltIn = buttonBuiltIn.getButtonConfig();
+  buttonConfigBuiltIn->setEventHandler(handleButtonEvent);
+  buttonConfigBuiltIn->setFeature(ButtonConfig::kFeatureClick);
+  buttonConfigBuiltIn->setFeature(ButtonConfig::kFeatureLongPress);
+  buttonConfigBuiltIn->setLongPressDelay(LONG_PRESS);
+#elif defined(HALLEFFECT_DEVICE)
+  Serial.println("halleffect device");
+  randomSeed(analogRead(0));
+  pinMode(BTN_PIN, INPUT);
+  buttonBuiltIn.init(BTN_PIN, HIGH);
+  ButtonConfig* buttonConfigBuiltIn = buttonBuiltIn.getButtonConfig();
+  buttonConfigBuiltIn->setEventHandler(handleButtonEvent);
+  buttonConfigBuiltIn->setFeature(ButtonConfig::kFeatureClick);
+  buttonConfigBuiltIn->setFeature(ButtonConfig::kFeatureLongPress);
+  buttonConfigBuiltIn->setLongPressDelay(LONG_PRESS);
+#elif defined(CAM_MOVEMENT_DEVICE)
+  Serial.println("cam movement device!");
   randomSeed(analogRead(4));
 #endif
   pinMode(LED,         OUTPUT);
