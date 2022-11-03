@@ -46,7 +46,8 @@ void publishSensorData(String mac, sensorTypes sensors , int event) {
     //should just do this when you receive it from the interface
     Serial.println(publishOut);
     // insertFeed(publishOut);
-    client.publish((String("IRS/f/") + publishOut).c_str(), aio_message.c_str());
+    String nameOut = getAIOUser()+"/f/";
+    client.publish((nameOut + publishOut).c_str(), aio_message.c_str());
   } else {
     Serial.println("no matching mac");
   }

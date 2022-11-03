@@ -1,6 +1,7 @@
 void createData(String feedname) {
   //String serverPath = "http://io.adafruit.com/api/v2/vastltd/groups/moth-net/feeds/";
-  String serverPath = "http://io.adafruit.com/api/v2/IRS/feeds/";
+  String serverPath = "http://io.adafruit.com/api/v2/";
+  serverPath = serverPath + getAIOUser() + "/feeds/";
   serverPath = serverPath + feedname;
   serverPath = serverPath + "/data";
   WiFiClient client;
@@ -29,7 +30,8 @@ void createData(String feedname) {
 void createFeed(String feedname) {
   feedname.toLowerCase();
   // String serverPath = "http://io.adafruit.com/api/v2/vastltd/groups/moth-net/feeds";
-  String serverPath = "http://io.adafruit.com/api/v2/IRS/feeds/";
+  String serverPath = "http://io.adafruit.com/api/v2/";
+  serverPath = serverPath + getAIOUser() + "/feeds/";
   WiFiClient client;
   HTTPClient httpPost;
 
