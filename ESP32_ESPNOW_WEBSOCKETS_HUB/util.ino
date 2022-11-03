@@ -127,7 +127,7 @@ void updateJson(const char* jsonIn) {
   file.close();
 }
 
-bool inDynamicJson(char* macStr) {
+bool inDynamicJson(char* macStr, int sensor) {
   bool inDynamicArray = false;
   int arraySize = dynamicDoc.size();
   Serial.print("Dynamic size: ");
@@ -135,9 +135,13 @@ bool inDynamicJson(char* macStr) {
   for (int i = 0; i < dynamicDoc.size(); i++) {
     Serial.println(dynamicDoc[i]["mac"].as<String>());
     if (dynamicDoc[i]["mac"] == macStr) {
-      inDynamicArray = true;
-      Serial.println("mac in dynamic array");
-      break;
+      if (dynamicDoc[i]["sensorType"] == sensor) {
+        inDynamicArray = true;
+        Serial.println("mac in dynamic array and sensorType is the same ");
+        break;
+      } else {
+        Serial.println("Sensor Type updated from save device list");
+      }
     }
   }
   return inDynamicArray;

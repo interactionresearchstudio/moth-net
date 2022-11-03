@@ -21,7 +21,7 @@ void onDataReceive(const uint8_t * mac_addr, const uint8_t *incomingData, int le
     Serial.println(msg.function);
     if (msg.function == heartbeat) {
       Serial.println("HeartBeat!");
-      if (inDynamicJson(macStr) == false) {
+      if (inDynamicJson(macStr,(int)msg.sensors) == false) {
         saveJSON(macStr, msg.sensors);
       } else {
         Serial.println("no need to save json");
