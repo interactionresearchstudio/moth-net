@@ -45,7 +45,8 @@ enum sensorTypes {
   servo,
   servo_continuous,
   on_pin,
-  hallEffect
+  hallEffect,
+  rgb_led
 };
 
 enum functionTypes {

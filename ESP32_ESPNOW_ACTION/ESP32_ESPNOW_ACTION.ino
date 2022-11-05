@@ -1,7 +1,8 @@
 //#define CAM_PHOTO_DEVICE
-//#define SERVO_DEVICE
-#define SERVO_CONTINUOUS_DEVICE
+#define SERVO_DEVICE
+//#define SERVO_CONTINUOUS_DEVICE
 //#define ON_PIN_DEVICE
+#define RGB_LED_DEVICE
 
 #include <Arduino.h>
 #include <SPIFFS.h>
@@ -53,7 +54,8 @@ enum sensorTypes {
   servo,
   servo_continuous,
   on_pin,
-  hallEffect
+  hallEffect,
+  rgb_led
 };
 
 enum functionTypes {
@@ -89,9 +91,15 @@ Servo myservo;
 #define DEVICE_TYPE servo_continuous
 #elif defined(ON_PIN_DEVICE)
 #define DEVICE_TYPE on_pin
-#endif
-
-#if defined(CAM_PHOTO_DEVICE)
+#elif defined(RGB_LED_DEVICE)
+#define DEVICE_TYPE rgb_led
+#elif defined(RGB_LED_DEVICE)
+#include <FastLED.h>
+// How many leds in your strip?
+#define NUM_LEDS 1
+#define DATA_PIN 4
+CRGB leds[NUM_LEDS];
+#elif defined(CAM_PHOTO_DEVICE)
 #include "esp_camera.h"
 #include "Arduino.h"
 #include "FS.h"                // SD Card ESP32
@@ -165,6 +173,9 @@ void setup() {
 #elif defined(CAM_PHOTO_DEVICE)
   setupCam();
   Serial.println("cam!");
+#elif defined(RGB_LED_DEVICE)
+  Serial.println("RGB LED");
+  FastLED.addLeds<NEOPIXEL, DATA_PIN>(leds, NUM_LEDS);  // GRB ordering is assumed
 #endif
   initPrefs();
   initWiFi();

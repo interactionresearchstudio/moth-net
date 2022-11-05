@@ -40,15 +40,10 @@ void performAction(int valueIn) {
   Serial.print("Value is: ");
   Serial.println(valueIn);
 #if defined(SERVO_DEVICE)
-  // if (valueIn == 49) {
   myservo.write(180);    // tell servo to go to position in variable 'pos'
   delay(1000);
   myservo.write(0);    // tell servo to go to position in variable 'pos'
   delay(1000);
-  //  delay(3);             // waits 15ms for the servo to reach the position
-  //  } else if (valueIn == 50) {
-  //    myservo.write(0);
-  //  }
 #elif defined(CAM_PHOTO_DEVICE)
   takePhoto();
 #elif defined(SERVO_CONTINUOUS_DEVICE)
@@ -62,5 +57,11 @@ void performAction(int valueIn) {
   digitalWrite(USER_PIN, 1);
   delay(3000);
   digitalWrite(USER_PIN, 0);
+#elif degfined(RGB_LED_DEVICE)
+  leds[0] = CHSV(valueIn, 255, 255);
+  FastLED.show();
+  delay(1000);
+  leds[0] = CHSV(valueIn, 255, 0);
+  FastLED.show();
 #endif
 }

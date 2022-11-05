@@ -48,6 +48,7 @@ enum sensorTypes {
   servo_continuous,
   on_pin,
   hallEffect,
+  rgb_led
 };
 
 typedef struct struct_message {
