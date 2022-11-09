@@ -134,22 +134,28 @@ void setup() {
   lastReconnectAttempt = 0;
 }
 bool ledState = false;
+unsigned long prevConnectCheck;
+#define connectMillis 1000
 
 void loop() {
-  if (isConnectedToInternet()) {
-    if (!client.connected()) {
-      long now = millis();
-      if (now - lastReconnectAttempt > 5000) {
-        lastReconnectAttempt = now;
-        // Attempt to reconnect
-        if (reconnect()) {
-          lastReconnectAttempt = 0;
+  if (millis() - prevConnectCheck > connectMillis) {
+    prevConnectCheck = millis();
+    if (isConnectedToInternet()) {
+      if (!client.connected()) {
+        long now = millis();
+        if (now - lastReconnectAttempt > 5000) {
+          lastReconnectAttempt = now;
+          // Attempt to reconnect
+          if (reconnect()) {
+            lastReconnectAttempt = 0;
+          }
         }
+      } else {
+
       }
-    } else {
-      client.loop();
     }
   }
+  client.loop();
   ws.cleanupClients();
   buttonBuiltIn.check();
   checkWebsocketRequests();
