@@ -2,7 +2,7 @@
 #define SERVO_DEVICE
 //#define SERVO_CONTINUOUS_DEVICE
 //#define ON_PIN_DEVICE
-#define RGB_LED_DEVICE
+//#define RGB_LED_DEVICE
 
 #include <Arduino.h>
 #include <SPIFFS.h>
@@ -18,9 +18,18 @@ Preferences prefs;
 // Definition of macros
 // ----------------------------------------------------------------------------
 bool isReceivedMsg = false;
-#define MSGTIMEOUT 480000
+#define MSGTIMEOUT 30000
+unsigned long heartbeatTimeout;
 int setWifi = 0;
 uint8_t baseMac[6];
+
+// ESPNOW settings
+unsigned long scanAckTime;
+#define scanWaitTime 100
+byte scanChannel = 1;
+bool isWaitingforScanAck = false;
+bool readyToScanChannels = false;
+int currWifiChannel = 1;
 
 #if defined(CAM_PHOTO_DEVICE)
 #define LED_PIN -1
@@ -64,7 +73,8 @@ enum functionTypes {
   heartbeat,
   wifiChannel,
   blinking,
-  heartbeatREQ
+  heartbeatREQ,
+  wifiChannelREQ
 };
 
 //Structure example to send data
@@ -194,5 +204,6 @@ void loop() {
   buttonBuiltIn.check();
 #endif
   delay(10);
-  // checkChannel();
+  checkChannel();
+  
 }

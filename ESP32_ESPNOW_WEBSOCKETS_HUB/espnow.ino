@@ -21,7 +21,7 @@ void onDataReceive(const uint8_t * mac_addr, const uint8_t *incomingData, int le
     Serial.println(msg.function);
     if (msg.function == heartbeat) {
       Serial.println("HeartBeat!");
-      if (inDynamicJson(macStr,(int)msg.sensors) == false) {
+      if (inDynamicJson(macStr, (int)msg.sensors) == false) {
         saveJSON(macStr, msg.sensors);
       } else {
         Serial.println("no need to save json");
@@ -32,6 +32,9 @@ void onDataReceive(const uint8_t * mac_addr, const uint8_t *incomingData, int le
     } else if (msg.function == sensor) {
       isSendingData = true;
       publishSensorData(macStr, msg.sensors, msg.eventVal);
+    } else if (msg.function == wifiChannelREQ) {
+      Serial.println("got wifi channel req");
+      sendESPNowChannel(getWifiChannel());
     }
   }
 }
@@ -46,7 +49,7 @@ void publishSensorData(String mac, sensorTypes sensors , int event) {
     //should just do this when you receive it from the interface
     Serial.println(publishOut);
     // insertFeed(publishOut);
-    String nameOut = getAIOUser()+"/f/";
+    String nameOut = getAIOUser() + "/f/";
     client.publish((nameOut + publishOut).c_str(), aio_message.c_str());
   } else {
     Serial.println("no matching mac");
@@ -55,7 +58,7 @@ void publishSensorData(String mac, sensorTypes sensors , int event) {
 }
 
 void singleChannelESPNOWStartup() {
-  esp_wifi_set_channel(1, WIFI_SECOND_CHAN_NONE);
+  esp_wifi_set_channel(getWifiChannel(), WIFI_SECOND_CHAN_NONE);
 
   if (esp_now_is_peer_exist(broadcastAddress)) {
     esp_now_del_peer(broadcastAddress);
@@ -115,7 +118,40 @@ void initESPNOW() {
   multiChannelESPNOWStartup();
   //singleChannelESPNOWStartup();
 
-  esp_wifi_set_channel(WiFi.channel(), WIFI_SECOND_CHAN_NONE);
+  esp_wifi_set_channel(getWifiChannel(), WIFI_SECOND_CHAN_NONE);
+
+  if (esp_now_is_peer_exist(broadcastAddress)) {
+    esp_now_del_peer(broadcastAddress);
+    Serial.println("deleting old peer");
+  }
+
+  // Register peer
+  memcpy(peerInfo.peer_addr, broadcastAddress, 6);
+  peerInfo.channel = getWifiChannel();
+  peerInfo.encrypt = false;
+
+  // Add peer
+  if (esp_now_add_peer(&peerInfo) != ESP_OK) {
+    Serial.println("Failed to add peer");
+    return;
+  }
+}
+
+void initESPNOWonReconnect() {
+  if (esp_now_init() == ESP_OK) {
+    Serial.println("ESPNow Init Success");
+  }
+  else {
+    Serial.println("ESPNow Init Failed");
+    //ESP.restart();
+  }
+
+  esp_now_register_recv_cb(onDataReceive);
+  esp_now_register_send_cb(OnDataSent);
+
+  singleChannelESPNOWStartup();
+
+  esp_wifi_set_channel(getWifiChannel(), WIFI_SECOND_CHAN_NONE);
 
   if (esp_now_is_peer_exist(broadcastAddress)) {
     esp_now_del_peer(broadcastAddress);
@@ -240,6 +276,7 @@ void sendHeartbeatREQ() {
   }
   else {
     Serial.println("Error sending the data");
+    initESPNOWonReconnect();
   }
 }
 
@@ -268,10 +305,10 @@ void addConnectedMac(String macIn) {
 }
 
 void clearConnectedMacs() {
- // for (int i = 0; i < macsOnline.size(); i++) {
- //   Serial.println(macsOnline[i].as<String>());
- // }
- Serial.println("cleared macs online before heartbeat");
+  // for (int i = 0; i < macsOnline.size(); i++) {
+  //   Serial.println(macsOnline[i].as<String>());
+  // }
+  Serial.println("cleared macs online before heartbeat");
   macsOnline.clear();
 }
 

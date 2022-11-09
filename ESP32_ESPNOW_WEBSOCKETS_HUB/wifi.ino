@@ -49,11 +49,26 @@ void connectToRouter(String SSID, String PASS, unsigned long timeOut) {
 }
 
 bool isConnectedToInternet() {
- if(WiFi.status() == WL_CONNECTED){
-  isConnected = true;
- } else {
-  isConnected = false;
- }
+  if (WiFi.status() == WL_CONNECTED) {
+    if(getWifiChannel() != WiFi.channel()){
+      setWifiChannel(WiFi.channel());
+    }
+    isConnected = true;
+    if (ledState == false) {
+      ledState = true;
+      digitalWrite(LED_PIN, HIGH);
+    }
+  } else {
+    isConnected = false;
+    if (ledState == true) {
+      ledState = false;
+      digitalWrite(LED_PIN, LOW);
+    }
+    if (millis() - prevConnectAttempt > reconnectInterval) {
+      prevConnectAttempt = millis();
+      WiFi.reconnect();
+    }
+  }
   return isConnected;
 }
 

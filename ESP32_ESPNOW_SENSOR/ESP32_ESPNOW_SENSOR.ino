@@ -1,8 +1,8 @@
-//#define CAP_TOUCH_DEVICE
+#define CAP_TOUCH_DEVICE
 //#define SIMPLE_SWITCH_DEVICE
 //#define CAM_MOVEMENT_DEVICE
 //#define RADAR_DEVICE
-#define HALLEFFECT_DEVICE
+//#define HALLEFFECT_DEVICE
 
 #include <Arduino.h>
 #include <SPIFFS.h>
@@ -19,13 +19,22 @@ Preferences prefs;
 
 //espnow msg
 bool isReceivedMsg = false;
-#define MSGTIMEOUT 480000
+#define MSGTIMEOUT 30000
+unsigned long heartbeatTimeout;
 uint8_t broadcastAddress[] = {0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF};
 
 //wifi channel
 int setWifi = 0;
 uint8_t baseMac[6];
 #define CHANNEL 1
+
+// ESPNOW settings
+unsigned long scanAckTime;
+#define scanWaitTime 100
+byte scanChannel = 1;
+bool isWaitingforScanAck = false;
+bool readyToScanChannels = false;
+int currWifiChannel = 1;
 
 
 //ESPNOW STRUCT
@@ -35,7 +44,8 @@ enum functionTypes {
   heartbeat,
   wifiChannel,
   blinking,
-  heartbeatREQ
+  heartbeatREQ,
+  wifiChannelREQ
 };
 
 enum sensorTypes {
@@ -197,5 +207,5 @@ void loop() {
 #elif defined(HALLEFFECT_DEVICE)
   checkHall();
 #endif
-  //checkChannel();
+  checkChannel();
 }
