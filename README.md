@@ -73,7 +73,4 @@ For all types of board (Action, Sensor or Hub) use ESP32-Dev-Module. For boards 
 
 ## To Do
  - Visual connection interface on captive portal
- - "On the Fly" Sensor and Action connections
- - Automatic ESP-NOW Channel configuration based on the Home Network Wi-Fi channel
  - Ability to deploy without home network connection
- - Change captive portal to YoYo Machines Wi-Fi captive portal named "moth-net" password "badgersandfoxes"
