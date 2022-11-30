@@ -27,7 +27,6 @@ void connectToMqtt() {
   if (getAIOUser() != "" && getAIOKey() != "") {
     if (client.connect(generateID().c_str(), getAIOUser().c_str(), getAIOKey().c_str())) {
       Serial.println("Connected to MQTT server");
-      digitalWrite(LED_PIN, HIGH);
       isConnectedAIO = true;
       //Test led feed
       feedName = getAIOUser() + String("/feeds/moth-hub-led");

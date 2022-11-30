@@ -41,8 +41,6 @@ void setEspNowChannel(int ch) {
     Serial.println("Failed to add peer");
     return;
   }
-
-
 }
 
 
@@ -87,13 +85,13 @@ void OnDataSent(const uint8_t *mac_addr, esp_now_send_status_t status) {
 }
 
 void checkChannel() {
-  if (isReceivedMsg == false) {
-    if (millis() > MSGTIMEOUT) {
-      Serial.println("Never received heartbeat, setting back to channel 1");
-      setSavedChannel(1);
-      ESP.restart();
-    }
+  if (millis() - heartbeatTimeout > MSGTIMEOUT) {
+    Serial.println("Never received heartbeat, scanning channels");
+    heartbeatTimeout = millis();
+    scanChannels();
+    //ESP.restart();
   }
+  scanChannelHandler();
 }
 
 boolean array_cmp(uint8_t *a, uint8_t *b, int len_a, int len_b) {
@@ -125,13 +123,24 @@ void onDataReceive(const uint8_t * mac_addr, const uint8_t *incomingData, int le
     Serial.print("Sensor type: ");
     Serial.println(msg.sensors);
     if (msg.function == wifiChannel) {
-      if (msg.eventVal != getWifiChannel()) {
+      Serial.println("wifi channel setting");
+      if (msg.eventVal != currWifiChannel) {
+        Serial.println("got new wifi channel");
         setEspNowChannel(msg.eventVal);
         setSavedChannel(msg.eventVal);
-        delay(2000);
+        setScanComplete();
+        delay(random(100));
+        sendHeartbeat();
+      } else {
+        Serial.println("wifi is already the current wifi channel");
+        setEspNowChannel(msg.eventVal);
+        setSavedChannel(msg.eventVal);
+        setScanComplete();
+        delay(random(100));
         sendHeartbeat();
       }
     } else if (msg.function == heartbeatREQ) {
+      heartbeatTimeout = millis();
       isReceivedMsg = true;
       //delay so they don't all send at the same time
       delay(random(100));
@@ -181,5 +190,42 @@ void sendSensor() {
   }
   else {
     Serial.println("Error sending the data");
+  }
+}
+
+void scanChannels() {
+  readyToScanChannels = true;
+}
+
+void setScanComplete() {
+  readyToScanChannels = false;
+  isWaitingforScanAck = false;
+  scanChannel = 1;
+  currWifiChannel = getWifiChannel();
+}
+void scanChannelHandler() {
+  if (readyToScanChannels == true) {
+    if (isWaitingforScanAck == false) {
+      if (scanChannel > 13) {
+        readyToScanChannels = false;
+        scanChannel = 1;
+      } else {
+        isWaitingforScanAck = true;
+        setEspNowChannel(scanChannel);
+        outgoingReadings.function = wifiChannelREQ;
+        outgoingReadings.sensors = DEVICE_TYPE;
+        outgoingReadings.eventVal = scanChannel;
+        esp_err_t result = esp_now_send(broadcastAddress, (uint8_t *) &outgoingReadings, sizeof(outgoingReadings));
+        Serial.print("Sending wifi on channel ");
+        Serial.println(scanChannel);
+        scanAckTime = millis();
+      }
+    }
+    if (isWaitingforScanAck == true) {
+      if (millis() - scanAckTime > scanWaitTime) {
+        isWaitingforScanAck = false;
+        scanChannel++;
+      }
+    }
   }
 }

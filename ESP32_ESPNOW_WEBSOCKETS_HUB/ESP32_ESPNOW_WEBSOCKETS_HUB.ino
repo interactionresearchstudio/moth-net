@@ -55,7 +55,8 @@ enum functionTypes {
   heartbeat,
   wifiChannel,
   blinking,
-  heartbeatREQ
+  heartbeatREQ,
+  wifiChannelREQ
 };
 
 //Structure example to send data
@@ -74,6 +75,10 @@ uint8_t macToSend[6];
 char *WIFI_SSID_AP = "MOTHNET";
 const char *WIFI_PASS_AP = "password";
 String WIFI_AP_NAME;
+
+//WiFi reconnection variables
+unsigned long prevConnectAttempt;
+#define reconnectInterval 10000
 
 //MQTT
 WiFiClient espClient;
@@ -129,31 +134,28 @@ void setup() {
   lastReconnectAttempt = 0;
 }
 bool ledState = false;
+unsigned long prevConnectCheck;
+#define connectMillis 1000
 
 void loop() {
-  if (isConnectedToInternet()) {
-    if (ledState == false) {
-      ledState = true;
-      digitalWrite(LED_PIN, HIGH);
-    }
-    if (!client.connected()) {
-      long now = millis();
-      if (now - lastReconnectAttempt > 5000) {
-        lastReconnectAttempt = now;
-        // Attempt to reconnect
-        if (reconnect()) {
-          lastReconnectAttempt = 0;
+  if (millis() - prevConnectCheck > connectMillis) {
+    prevConnectCheck = millis();
+    if (isConnectedToInternet()) {
+      if (!client.connected()) {
+        long now = millis();
+        if (now - lastReconnectAttempt > 5000) {
+          lastReconnectAttempt = now;
+          // Attempt to reconnect
+          if (reconnect()) {
+            lastReconnectAttempt = 0;
+          }
         }
+      } else {
+
       }
-    } else {
-      client.loop();
-    }
-  } else {
-    if (ledState == true) {
-      ledState = false;
-      digitalWrite(LED_PIN, LOW);
     }
   }
+  client.loop();
   ws.cleanupClients();
   buttonBuiltIn.check();
   checkWebsocketRequests();
